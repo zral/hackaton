@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐣 Påskehackaton — Interne Verktøy med AI</title>
+    <style>
+        /* ── Reset & Base ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0f0e18;
+            --bg-card: #161524;
+            --bg-card-hover: #1e1c32;
+            --border: #2e2a50;
+            --text: #f0ecf8;
+            --text-muted: #a09ab8;
+            --accent: #c49eff;
+            --accent-glow: rgba(196, 158, 255, 0.3);
+            --accent2: #7ed8a0;
+            --accent2-glow: rgba(126, 216, 160, 0.25);
+            --accent3: #ffb3c1;
+            --accent4: #ffe066;
+            --easter-pink: #ffb3c1;
+            --easter-yellow: #ffe066;
+            --easter-blue: #9dd5f5;
+            --easter-green: #a8e6cf;
+            --easter-lavender: #d4b8ff;
+            --easter-orange: #ffcc80;
+            --radius: 16px;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ── Navigation ── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(15, 14, 24, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            transition: box-shadow 0.3s;
+        }
+
+        nav.scrolled { box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4), 0 0 60px rgba(196, 158, 255, 0.05); }
+
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--accent);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .nav-logo span {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.25rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-links a .nav-icon {
+            margin-right: 0.3rem;
+            opacity: 0.5;
+        }
+
+        /* Mobile nav */
+        .nav-toggle { display: none; background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
+
+        @media (max-width: 768px) {
+            .nav-toggle { display: block; }
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background: rgba(10, 10, 15, 0.95);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                padding: 1rem;
+                border-bottom: 1px solid var(--border);
+            }
+            .nav-links.open { display: flex; }
+        }
+
+        /* ── Sections ── */
+        section {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+        }
+
+        /* ── Hero ── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            padding-top: 60px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 900px;
+            height: 900px;
+            background: radial-gradient(circle at 25% 35%, rgba(196, 158, 255, 0.2) 0%, transparent 45%),
+                        radial-gradient(circle at 75% 55%, rgba(255, 179, 193, 0.18) 0%, transparent 45%),
+                        radial-gradient(circle at 50% 75%, rgba(255, 224, 102, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 60% 20%, rgba(157, 213, 245, 0.12) 0%, transparent 40%),
+                        radial-gradient(circle at 35% 65%, rgba(168, 230, 207, 0.1) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Giant Easter Egg behind hero ── */
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 620px;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            background: linear-gradient(180deg, 
+                rgba(196, 158, 255, 0.04) 0%,
+                rgba(255, 179, 193, 0.03) 30%,
+                rgba(255, 224, 102, 0.03) 60%,
+                rgba(168, 230, 207, 0.04) 100%);
+            border: 1px solid rgba(196, 158, 255, 0.06);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hero > * { position: relative; z-index: 1; }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(108, 99, 255, 0.1);
+            border: 1px solid rgba(108, 99, 255, 0.2);
+            color: var(--accent);
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1.05;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-sub {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 550px;
+            margin: 1rem auto 2.5rem;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-meta span { display: flex; align-items: center; gap: 0.4rem; }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--easter-lavender), var(--easter-pink), var(--easter-yellow));
+            color: #1a1a2e;
+            text-decoration: none;
+            padding: 1rem 2.5rem;
+            border-radius: 100px;
+            font-weight: 800;
+            font-size: 1.05rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 25px rgba(255, 179, 193, 0.3);
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 40px rgba(255, 179, 193, 0.4);
+        }
+
+        .hero-terminal {
+            margin-top: 3rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem 2rem;
+            font-family: var(--mono);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-align: left;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .hero-terminal .prompt { color: var(--accent2); }
+        .hero-terminal .cmd { color: var(--text); }
+
+        /* ── Schedule / Timeline ── */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--easter-lavender), var(--easter-pink), var(--easter-yellow), var(--easter-green), var(--easter-blue));
+            border-radius: 3px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+            padding-left: 1.5rem;
+        }
+
+        .timeline-item::before {
+            content: '🥚';
+            position: absolute;
+            left: -2.3rem;
+            top: 0.3rem;
+            width: 22px;
+            height: 22px;
+            font-size: 1.1rem;
+            line-height: 1;
+            border: none;
+            background: none;
+            border-radius: 0;
+        }
+
+        .timeline-item:nth-child(2)::before { content: '🐣'; }
+        .timeline-item:nth-child(3)::before { content: '🐰'; font-size: 1.2rem; }
+        .timeline-item:nth-child(4)::before { content: '🌷'; }
+        .timeline-item:nth-child(5)::before { content: '🌸'; }
+        .timeline-item:last-child::before {
+            content: '🍽️';
+            border: none;
+            background: none;
+            font-size: 1.2rem;
+        }
+
+        .timeline-time {
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .timeline-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0.2rem 0;
+        }
+
+        .timeline-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ── Cards ── */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            border-color: rgba(108, 99, 255, 0.3);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .card-tag {
+            display: inline-block;
+            background: rgba(108, 99, 255, 0.1);
+            color: var(--accent);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 100px;
+            margin-top: 1rem;
+        }
+
+        /* ── Task detail cards (larger) ── */
+        .task-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .task-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .task-card:nth-child(1)::before { background: linear-gradient(90deg, var(--easter-lavender), var(--easter-pink), var(--easter-yellow)); }
+        .task-card:nth-child(2)::before { background: linear-gradient(90deg, var(--easter-yellow), var(--easter-green), var(--easter-blue)); }
+        .task-card:nth-child(3)::before { background: linear-gradient(90deg, var(--easter-blue), var(--easter-lavender), var(--easter-pink)); }
+        .task-card:nth-child(4)::before { background: linear-gradient(90deg, var(--easter-pink), var(--easter-orange), var(--easter-yellow)); }
+
+        .task-card::after {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 2.5rem;
+            opacity: 0.12;
+        }
+        .task-card:nth-child(1)::after { content: '🥚'; }
+        .task-card:nth-child(2)::after { content: '🐣'; }
+        .task-card:nth-child(3)::after { content: '🐰'; }
+        .task-card:nth-child(4)::after { content: '🌷'; }
+
+        .task-number {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: var(--accent);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .task-card h3 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 0.3rem;
+        }
+
+        .task-card .task-tagline {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .task-features {
+            list-style: none;
+            margin-bottom: 1.2rem;
+        }
+
+        .task-features li {
+            padding: 0.3rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .task-features li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent2);
+            font-weight: bold;
+        }
+
+        .task-value {
+            background: rgba(0, 212, 170, 0.08);
+            border-left: 3px solid var(--accent2);
+            padding: 0.8rem 1rem;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85rem;
+            color: var(--accent2);
+        }
+
+        .task-bonus {
+            margin-top: 0.8rem;
+            font-size: 0.85rem;
+            color: var(--accent4);
+        }
+
+        .task-bonus strong { color: var(--accent4); }
+
+        /* ── Rules ── */
+        .rules-list {
+            list-style: none;
+            counter-reset: rule;
+        }
+
+        .rules-list li {
+            counter-increment: rule;
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .rules-list li::before {
+            content: counter(rule);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 42px;
+            background: linear-gradient(180deg, var(--easter-lavender), var(--easter-pink));
+            color: #1a1a2e;
+            font-weight: 800;
+            font-size: 0.85rem;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        }
+
+        .rules-list li:nth-child(2)::before { background: linear-gradient(180deg, var(--easter-yellow), var(--easter-orange)); }
+        .rules-list li:nth-child(3)::before { background: linear-gradient(180deg, var(--easter-blue), var(--easter-green)); }
+        .rules-list li:nth-child(4)::before { background: linear-gradient(180deg, var(--easter-pink), var(--easter-lavender)); }
+        .rules-list li:nth-child(5)::before { background: linear-gradient(180deg, var(--easter-green), var(--easter-yellow)); }
+
+        .rule-text { font-size: 0.95rem; }
+        .rule-text strong { color: var(--text); }
+        .rule-text span { color: var(--text-muted); }
+
+        /* ── Evaluation table ── */
+        .eval-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+
+        .eval-table th,
+        .eval-table td {
+            padding: 1rem 1.2rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .eval-table th {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .eval-table td:first-child { font-weight: 600; }
+        .eval-table td:last-child { color: var(--accent4); letter-spacing: 2px; }
+
+        .eval-table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+        /* ── Team composition ── */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .team-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .team-item .team-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .team-item h4 { font-size: 0.95rem; margin-bottom: 0.3rem; }
+        .team-item p { font-size: 0.8rem; color: var(--text-muted); }
+
+        /* ── Tech badges ── */
+        .tech-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .tech-badge {
+            background: rgba(108, 99, 255, 0.08);
+            border: 1px solid rgba(108, 99, 255, 0.15);
+            color: var(--text-muted);
+            padding: 0.3rem 0.8rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* ── Tips section ── */
+        .tip-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem 2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .tip-icon {
+            flex-shrink: 0;
+            font-size: 1.3rem;
+            margin-top: 0.1rem;
+        }
+
+        .tip-card h4 { font-size: 0.95rem; margin-bottom: 0.3rem; }
+        .tip-card p { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* ── Copilot highlight section ── */
+        .copilot-section {
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.05), rgba(0, 212, 170, 0.05));
+            border: 1px solid rgba(108, 99, 255, 0.15);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        .copilot-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .copilot-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .copilot-feature {
+            display: flex;
+            gap: 0.7rem;
+            align-items: flex-start;
+        }
+
+        .copilot-feature .cf-icon { color: var(--accent2); font-size: 1.2rem; flex-shrink: 0; }
+        .copilot-feature p { font-size: 0.85rem; color: var(--text-muted); }
+        .copilot-feature strong { color: var(--text); display: block; margin-bottom: 0.2rem; }
+
+        /* ── Footer ── */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── Divider with Easter eggs ── */
+        .section-divider {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 1.2rem;
+            letter-spacing: 1.5rem;
+            opacity: 0.4;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+
+        .section-divider::before {
+            content: '🥚 🌷 🐣 🌸 🐰';
+        }
+
+        .section-divider::after {
+            content: '';
+            position: absolute;
+            left: 10%;
+            right: 10%;
+            top: 50%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            z-index: -1;
+        }
+
+        /* ── Scroll progress ── */
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--easter-lavender), var(--easter-pink), var(--easter-yellow), var(--easter-green), var(--easter-blue), var(--easter-lavender));
+            z-index: 200;
+            transition: width 0.1s;
+        }
+
+        /* ── Animations ── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        /* ── Easter Eggs floating ── */
+        .easter-eggs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .easter-egg {
+            position: absolute;
+            opacity: 0.2;
+            animation: floatEgg linear infinite;
+            filter: drop-shadow(0 0 8px rgba(255, 179, 193, 0.3));
+        }
+
+        @keyframes floatEgg {
+            0% { transform: translateY(110vh) rotate(0deg) scale(1); }
+            50% { transform: translateY(50vh) rotate(180deg) scale(1.1); }
+            100% { transform: translateY(-10vh) rotate(360deg) scale(1); }
+        }
+
+        /* ── Easter egg hunt (clickable hidden eggs) ── */
+        .hidden-egg {
+            position: absolute;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0.15;
+            z-index: 50;
+            filter: grayscale(0.5);
+        }
+
+        .hidden-egg:hover {
+            opacity: 0.6;
+            filter: grayscale(0);
+            transform: scale(1.2);
+        }
+
+        .hidden-egg.found {
+            opacity: 1 !important;
+            filter: grayscale(0) !important;
+            transform: scale(1.5) !important;
+            animation: eggFound 0.6s ease;
+        }
+
+        @keyframes eggFound {
+            0% { transform: scale(1); }
+            50% { transform: scale(2) rotate(20deg); }
+            100% { transform: scale(1.5) rotate(0deg); }
+        }
+
+        /* ── Egg hunt counter ── */
+        .egg-counter {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: rgba(22, 21, 36, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--easter-yellow);
+            border-radius: 100px;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+            color: var(--easter-yellow);
+            font-weight: 700;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 20px rgba(255, 224, 102, 0.15);
+            transition: all 0.3s;
+        }
+
+        .egg-counter.complete {
+            border-color: var(--easter-green);
+            color: var(--easter-green);
+            box-shadow: 0 4px 20px rgba(168, 230, 207, 0.2);
+        }
+
+        /* ── Easter grass decoration ── */
+        .easter-grass {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .easter-grass::after {
+            content: '🌱🌿🌱🌿🌱🌿🌱🌿🌱🌿🌱🌿🌱🌿🌱🌿🌱🌿🌱🌿🌱🌿🌱🌿🌱🌿🌱🌿🌱🌿';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            right: 0;
+            font-size: 0.9rem;
+            letter-spacing: 0;
+            opacity: 0.15;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        /* ── Easter confetti burst on egg find ── */
+        .confetti {
+            position: fixed;
+            pointer-events: none;
+            z-index: 300;
+            font-size: 1.5rem;
+            animation: confettiFall 1.5s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+            100% { transform: translateY(200px) rotate(720deg) scale(0); opacity: 0; }
+        }
+
+        /* ── Easter banner ── */
+        .easter-banner {
+            text-align: center;
+            padding: 0.6rem 1rem;
+            background: linear-gradient(90deg, 
+                rgba(212, 184, 255, 0.15),
+                rgba(255, 179, 193, 0.15),
+                rgba(255, 224, 102, 0.15),
+                rgba(168, 230, 207, 0.15),
+                rgba(157, 213, 245, 0.15));
+            border-bottom: 1px solid rgba(255, 224, 102, 0.2);
+            font-size: 0.85rem;
+            color: var(--easter-yellow);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 101;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        nav { top: 35px !important; }
+        .hero { padding-top: 95px; }
+
+        /* ── Decorated card borders ── */
+        .team-item {
+            transition: all 0.3s;
+        }
+
+        .team-item:hover {
+            border-color: var(--easter-pink);
+            box-shadow: 0 0 20px rgba(255, 179, 193, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .tip-card {
+            transition: all 0.3s;
+        }
+
+        .tip-card:hover {
+            border-color: var(--easter-lavender);
+            box-shadow: 0 0 20px rgba(212, 184, 255, 0.08);
+        }
+
+        /* ── Easter-themed eval table rows ── */
+        .eval-table tr:nth-child(1) td:last-child::after { content: ' 🥚'; }
+        .eval-table tr:nth-child(2) td:last-child::after { content: ' 🐣'; }
+        .eval-table tr:nth-child(3) td:last-child::after { content: ' 🐰'; }
+        .eval-table tr:nth-child(4) td:last-child::after { content: ' 🌷'; }
+    </style>
+</head>
+<body>
+
+<!-- Easter Banner -->
+<div class="easter-banner">� God påske! Finn alle 7 gjemte påskeegg på siden for en overraskelse! 🥚🐣🌷</div>
+
+<!-- Floating Easter Eggs -->
+<div class="easter-eggs" id="easterEggs"></div>
+
+<!-- Navigation -->
+<nav id="nav">
+    <div class="nav-inner">
+        <a href="#hero" class="nav-logo">🐰 <span>Påskehackaton 2026</span></a>
+        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Meny">☰</button>
+        <ul class="nav-links">
+            <li><a href="#tidsplan"><span class="nav-icon">⏱</span> Tidsplan</a></li>
+            <li><a href="#team"><span class="nav-icon">👥</span> Team</a></li>
+            <li><a href="#regler"><span class="nav-icon">#</span> Regler</a></li>
+            <li><a href="#oppgaver"><span class="nav-icon">▸</span> Oppgaver</a></li>
+            <li><a href="#vurdering"><span class="nav-icon">⭐</span> Vurdering</a></li>
+            <li><a href="#tips"><span class="nav-icon">💡</span> Tips</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="hero">
+    <div class="hero-badge">🥚🐣🐰 Påskehackaton 2026 🌷🌸🥚</div>
+    <h1 class="animate">Påskens store<br><span class="gradient">kode-eggjakt!</span></h1>
+    <p class="hero-sub animate delay-1">Knus skallet, klek ut prototyper og demo verktøy vi faktisk trenger — med GitHub Copilot som påskehare. 🐰</p>
+    <div class="hero-meta animate delay-2">
+        <span>🐣 Påsken 2026</span>
+        <span>⏱ 2,5 timer + påskemiddag</span>
+        <span>� Sofakroken, KK1</span>
+        <span>🤖 AI-assistert</span>
+    </div>
+    <a href="#oppgaver" class="hero-cta animate delay-3">🥚 Finn oppgavene ↓</a>
+    <div class="hero-terminal animate delay-4">
+        <span class="prompt">$</span> <span class="cmd">påske-hackaton --klek --ai copilot --egg-hunt</span><br>
+        <span style="color: var(--easter-green);">🐣</span> Team klekket &nbsp;
+        <span style="color: var(--easter-lavender);">🐰</span> Copilot som påskehare &nbsp;
+        <span style="color: var(--easter-yellow);">🥚</span> Let etter påskeegg!
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Ta med -->
+<section id="tamed">
+    <div class="section-label">🎒 Forberedelser</div>
+    <h2 class="section-title">Hva du må ha med</h2>
+    <p class="section-subtitle">Tre ting du må ha i orden før du møter opp i sofakroken i KK1 👇</p>
+
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-icon">💻</div>
+            <h3>Egen laptop</h3>
+            <p>Ta med din egen maskin med utviklingsmiljø klar. Sjekk at du har VS Code (eller foretrukket editor) installert og oppdatert.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">🐙</div>
+            <h3>GitHub-konto</h3>
+            <p>Du trenger en GitHub-konto for å samarbeide i teamets repo. Opprett en på <strong>github.com</strong> om du ikke har fra før.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon">🤖</div>
+            <h3>GitHub Copilot-lisens</h3>
+            <p>Sørg for at du har tilgang til GitHub Copilot i editoren din. Vi oppfordrer alle team til å bruke Copilot aktivt — det er en del av moroa!</p>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Tidsplan -->
+<section id="tidsplan">
+    <div class="section-label">🐣 Tidsplan</div>
+    <h2 class="section-title">Påskens program</h2>
+    <p class="section-subtitle">Påskeegg og snacks ved oppstart — felles påskemiddag etterpå som belønning. 🍫</p>
+
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="timeline-time">16:00 – 16:15</div>
+            <div class="timeline-title">Velkommen & briefing</div>
+            <div class="timeline-desc">Presentasjon av oppgaver, teamsammensetning og spilleregler. Kort intro til hvordan Copilot kan brukes effektivt.</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-time">16:15 – 16:25</div>
+            <div class="timeline-title">Team setter seg sammen</div>
+            <div class="timeline-desc">Kort planlegging, fordeling av roller — hvem tar frontend, backend, design?</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-time">16:25 – 18:00</div>
+            <div class="timeline-title">🔨 Hacking!</div>
+            <div class="timeline-desc">Bygg prototypen. Bruk Copilot, par-programmer, eksperimenter. Fokus på fungerende demo.</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-time">18:00 – 18:20</div>
+            <div class="timeline-title">Demo-runde</div>
+            <div class="timeline-desc">Hvert team har 3–4 minutter til å vise hva de har bygget. Vis også hvordan AI ble brukt!</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-time">18:20 – 18:30</div>
+            <div class="timeline-title">Avstemning & oppsummering</div>
+            <div class="timeline-desc">Alle stemmer på sin favoritt. Kort oppsummering og neste steg.</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-time">18:45</div>
+            <div class="timeline-title">🍽️ Felles påskemiddag</div>
+            <div class="timeline-desc">Restaurant i nærheten. Prat om det dere har laget, del erfaringer, kos dere! Påskeegg inkludert 🐣</div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Team -->
+<section id="team">
+    <div class="section-label">� Teamsammensetning</div>
+    <h2 class="section-title">Påskens kyllinger</h2>
+    <p class="section-subtitle">5–6 kull med 6–7 kyllinger per team — blanding av erfaring, kompetanse og bakgrunn. 🐥</p>
+
+    <div class="team-grid">
+        <div class="team-item">
+            <div class="team-icon">🎯</div>
+            <h4>Minst 1 D-grad</h4>
+            <p>Senior/managing konsulent som kan drive teamet</p>
+        </div>
+        <div class="team-item">
+            <div class="team-icon">🌱</div>
+            <h4>Minst 1 A/B-grad</h4>
+            <p>Junior/konsulent som får lære og bidra</p>
+        </div>
+        <div class="team-item">
+            <div class="team-icon">🔀</div>
+            <h4>Miks av kompetanse</h4>
+            <p>Frontend, backend og infra på hvert team</p>
+        </div>
+        <div class="team-item">
+            <div class="team-icon">🤝</div>
+            <h4>Tverrfaglig</h4>
+            <p>Miks av frontend, backend og infra-folk</p>
+        </div>
+    </div>
+
+    <div class="copilot-section">
+        <h3>🤖 GitHub Copilot — din AI-makker</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Alle team skal bruke GitHub Copilot aktivt. Her er noen tips for å få mest mulig ut av det:</p>
+        <div class="copilot-features">
+            <div class="copilot-feature">
+                <div class="cf-icon">▸</div>
+                <div>
+                    <strong>Chat</strong>
+                    <p>Spør Copilot om arkitekturforslag, API-design og kodegenerering</p>
+                </div>
+            </div>
+            <div class="copilot-feature">
+                <div class="cf-icon">▸</div>
+                <div>
+                    <strong>Agent Mode</strong>
+                    <p>La Copilot bygge hele features — beskriv hva du vil ha</p>
+                </div>
+            </div>
+            <div class="copilot-feature">
+                <div class="cf-icon">▸</div>
+                <div>
+                    <strong>Inline Suggestions</strong>
+                    <p>Skriv kommentarer som beskriver hva koden skal gjøre — Copilot fullfører</p>
+                </div>
+            </div>
+            <div class="copilot-feature">
+                <div class="cf-icon">▸</div>
+                <div>
+                    <strong>Vis det i demo!</strong>
+                    <p>Del chat-historikk eller vis hvordan AI hjalp dere under presentasjonen</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 1.5rem;">
+        <p style="font-size: 0.9rem; color: var(--text-muted);">Teamets tech-stack er fritt innenfor:</p>
+        <div class="tech-badges">
+            <span class="tech-badge">React</span>
+            <span class="tech-badge">Angular</span>
+            <span class="tech-badge">Vue</span>
+            <span class="tech-badge">Java</span>
+            <span class="tech-badge">C#</span>
+            <span class="tech-badge">Azure</span>
+            <span class="tech-badge">Terraform</span>
+            <span class="tech-badge">TypeScript</span>
+            <span class="tech-badge">GitHub Copilot</span>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Regler -->
+<section id="regler">
+    <div class="section-label">🥚 Spilleregler</div>
+    <h2 class="section-title">Regler for eggjakten</h2>
+    <p class="section-subtitle">Fokus er på fungerende prototype — ikke perfeksjon. Knus skallet og vis fram!</p>
+
+    <ol class="rules-list">
+        <li>
+            <div class="rule-text">
+                <strong>GitHub Copilot skal brukes aktivt</strong><br>
+                <span>Teamet må vise i demoen hvordan AI-verktøy ble brukt (chat-historikk, generert kode, agent mode)</span>
+            </div>
+        </li>
+        <li>
+            <div class="rule-text">
+                <strong>Felles GitHub-repo</strong><br>
+                <span>Alt kode skal ligge i et repo som er opprettet på forhånd med basic oppsett</span>
+            </div>
+        </li>
+        <li>
+            <div class="rule-text">
+                <strong>Fritt teknologivalg</strong><br>
+                <span>Velg fra stacken vi kan: React, Angular, Vue, Java, C#, Azure, Terraform</span>
+            </div>
+        </li>
+        <li>
+            <div class="rule-text">
+                <strong>Deploy er valgfritt</strong><br>
+                <span>En lokal demo er helt OK — det viktige er at det fungerer</span>
+            </div>
+        </li>
+        <li>
+            <div class="rule-text">
+                <strong>Prototype &gt; perfeksjon</strong><br>
+                <span>Vis et konsept som funker — hardkoding og mock-data er lov</span>
+            </div>
+        </li>
+    </ol>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Oppgaver -->
+<section id="oppgaver">
+    <div class="section-label">🐣 Oppgaver</div>
+    <h2 class="section-title">Fire egg å klekke</h2>
+    <p class="section-subtitle">Fire påskeegg fulle av muligheter — hvert team plukker ett egg og klekker det ut! 🥚</p>
+
+    <div class="task-card">
+        <div class="task-number">Oppgave 01</div>
+        <h3>🗺️ Konsulentkartet</h3>
+        <p class="task-tagline">Webside med oversikt over konsulentenes status</p>
+        <ul class="task-features">
+            <li>Vis alle ~170 konsulenter (på tvers av avdelinger) med status: i oppdrag / tilgjengelig / delvis tilgjengelig</li>
+            <li>Grafisk visning: dashbord med filtrering per avdeling, kompetanse, grad</li>
+            <li>Enkel UI for å oppdatere sin egen status</li>
+        </ul>
+        <p class="task-bonus">⭐ <strong>Bonus:</strong> Tidslinjevisning (når blir folk tilgjengelige), integrasjon mot kalender</p>
+        <div class="task-value">💡 Ledere og salg får umiddelbar oversikt over kapasitet uten å spørre rundt.</div>
+    </div>
+
+    <div class="task-card">
+        <div class="task-number">Oppgave 02</div>
+        <h3>🧠 Kompetansematrisen</h3>
+        <p class="task-tagline">Intern kompetanseoversikt og matchmaking</p>
+        <ul class="task-features">
+            <li>Konsulenter registrerer sine kompetanser og interesser (teknologi, domene, sertifiseringer)</li>
+            <li>Søkbar oversikt: «Hvem kan Terraform og har Azure-sertifisering?»</li>
+            <li>Visualisering av kompetansefordeling i avdelingen (heatmap / bubblediagram)</li>
+        </ul>
+        <p class="task-bonus">⭐ <strong>Bonus:</strong> Forslag til kompetansegap, kobling mot kursplattform</p>
+        <div class="task-value">💡 Raskere bemanning, bedre oversikt over hva teamet faktisk kan.</div>
+    </div>
+
+    <div class="task-card">
+        <div class="task-number">Oppgave 03</div>
+        <h3>📋 Prosjekthub</h3>
+        <p class="task-tagline">Intern oversikt over aktive oppdrag og prosjekterfaringer</p>
+        <ul class="task-features">
+            <li>Liste over aktive og avsluttede prosjekter med teknologistack, kunde (anonymisert), teammedlemmer</li>
+            <li>Konsulenter kan legge til «lessons learned» og vurderinger</li>
+            <li>Søk og filtrering: «Vis alle prosjekter med React og Azure»</li>
+        </ul>
+        <p class="task-bonus">⭐ <strong>Bonus:</strong> Automatisk genererte prosjektoppsummeringer med AI</p>
+        <div class="task-value">💡 Erfaringsdeling på tvers — ny på et prosjekt? Sjekk hva forrige team lærte.</div>
+    </div>
+
+    <div class="task-card">
+        <div class="task-number">Oppgave 04</div>
+        <h3>🚀 Ignite Tracker</h3>
+        <p class="task-tagline">Dashboard for graduate-programmet</p>
+        <ul class="task-features">
+            <li>Oversikt over alle som er i Ignite-programmet med fremdrift</li>
+            <li>Moduler, sertifiseringer, mentorer, prosjektstatus</li>
+            <li>Visuell fremdriftsmåler per kandidat</li>
+        </ul>
+        <p class="task-bonus">⭐ <strong>Bonus:</strong> Automatisk påminnelse/notifikasjoner, feedback-modul fra mentor</p>
+        <div class="task-value">💡 Bedre oppfølging av graduates — sikre at ingen faller mellom stolene.</div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Vurdering -->
+<section id="vurdering">
+    <div class="section-label">🌟 Vurdering</div>
+    <h2 class="section-title">Hvem legger det gylne egget?</h2>
+    <p class="section-subtitle">Alle stemmer — påskens favoritt vinner heder og ære! Fokus er samarbeid, ikke hard konkurranse. 🏆</p>
+
+    <table class="eval-table">
+        <thead>
+            <tr>
+                <th>Kriterium</th>
+                <th>Beskrivelse</th>
+                <th>Vekt</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Fungerende demo</td>
+                <td style="color: var(--text-muted)">Viser det noe reelt som fungerer?</td>
+                <td>⭐⭐⭐</td>
+            </tr>
+            <tr>
+                <td>Nytteverdi</td>
+                <td style="color: var(--text-muted)">Ville vi faktisk brukt dette internt?</td>
+                <td>⭐⭐⭐</td>
+            </tr>
+            <tr>
+                <td>Bruk av AI / Copilot</td>
+                <td style="color: var(--text-muted)">Smart og kreativ utnyttelse av AI-verktøy</td>
+                <td>⭐⭐</td>
+            </tr>
+            <tr>
+                <td>Wow-faktor</td>
+                <td style="color: var(--text-muted)">Kreativitet, design, ambisjon utover det forventede</td>
+                <td>⭐</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Tips -->
+<section id="tips">
+    <div class="section-label">🌷 Tips</div>
+    <h2 class="section-title">Påskeharens gode råd</h2>
+    <p class="section-subtitle">Visdom fra en hare som har lagt mange egg. 🐰</p>
+
+    <div class="tip-card">
+        <div class="tip-icon">🤝</div>
+        <div>
+            <h4>Samarbeid &gt; konkurranse</h4>
+            <p>Det handler ikke om å vinne, men om å bygge noe sammen. En enkel «publikumsfavoritt» er nok.</p>
+        </div>
+    </div>
+
+    <div class="tip-card">
+        <div class="tip-icon">📸</div>
+        <div>
+            <h4>Dokumenter!</h4>
+            <p>Ta bilder og video underveis — bruk det i intern kommunikasjon og rekruttering.</p>
+        </div>
+    </div>
+
+    <div class="tip-card">
+        <div class="tip-icon">🔄</div>
+        <div>
+            <h4>Følg opp etterpå</h4>
+            <p>Plukk opp den beste prototypen og gi teamet tid til å fullføre den. Det gir mening til hele arrangementet.</p>
+        </div>
+    </div>
+
+    <div class="tip-card">
+        <div class="tip-icon">⚡</div>
+        <div>
+            <h4>Start enkelt</h4>
+            <p>Hardkodet data og mock-APIer er helt OK. Fokuser på noe som fungerer og ser bra ut — det kan alltid utvides.</p>
+        </div>
+    </div>
+
+    <div class="tip-card">
+        <div class="tip-icon">🤖</div>
+        <div>
+            <h4>La Copilot gjøre det kjedelige</h4>
+            <p>Boilerplate, styling, datamodeller — bruk AI-verktøy der det sparer mest tid, og legg kreativiteten i designvalg og brukeropplevelse.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="easter-grass">
+    <p style="font-size: 2rem; margin-bottom: 1rem;">🐰🥚🐣🌷🌸🐥</p>
+    <p style="margin-bottom: 0.5rem; font-size: 0.95rem; color: var(--easter-yellow);">Påskehackaton 2026</p>
+    <p style="margin-bottom: 0.5rem;">Klek ut noe vi trenger. Ha det gøy. Spis påskemiddag sammen.</p>
+    <p style="font-size: 0.75rem; margin-top: 1rem;">God påske fra hele teamet! 🐣</p>
+</footer>
+
+<!-- Egg Hunt Counter -->
+<div class="egg-counter" id="eggCounter">🥚 <span id="eggCount">0</span>/7 egg funnet</div>
+
+<!-- Scroll progress -->
+<div class="progress-bar" id="progress"></div>
+
+<script>
+    // Scroll progress bar
+    window.addEventListener('scroll', () => {
+        const h = document.documentElement;
+        const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+        document.getElementById('progress').style.width = pct + '%';
+
+        // Nav shadow
+        document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    // Close mobile nav on link click
+    document.querySelectorAll('.nav-links a').forEach(a => {
+        a.addEventListener('click', () => {
+            document.querySelector('.nav-links').classList.remove('open');
+        });
+    });
+
+    // Intersection Observer for fade-in animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.task-card, .tip-card, .timeline-item, .team-item').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        observer.observe(el);
+    });
+
+    // When animate class added via observer
+    const origObserverCallback = observer;
+    const style = document.createElement('style');
+    style.textContent = `.animate { opacity: 1 !important; transform: translateY(0) !important; }`;
+    document.head.appendChild(style);
+
+    // Floating Easter eggs — more and bigger!
+    const eggContainer = document.getElementById('easterEggs');
+    const eggEmojis = ['🥚', '🐣', '🐰', '🌷', '🌸', '🐥', '🌿', '🍫', '🐇', '🪺'];
+    for (let i = 0; i < 25; i++) {
+        const egg = document.createElement('div');
+        egg.className = 'easter-egg';
+        egg.textContent = eggEmojis[Math.floor(Math.random() * eggEmojis.length)];
+        egg.style.left = Math.random() * 100 + '%';
+        egg.style.animationDuration = (15 + Math.random() * 30) + 's';
+        egg.style.animationDelay = (Math.random() * 15) + 's';
+        egg.style.fontSize = (1.2 + Math.random() * 1.8) + 'rem';
+        eggContainer.appendChild(egg);
+    }
+
+    // ── Easter Egg Hunt Game ──
+    let eggsFound = 0;
+    const totalEggs = 7;
+    const eggPositions = [
+        { section: '#tidsplan', top: '15%', right: '5%', emoji: '🥚' },
+        { section: '#team', top: '40%', left: '3%', emoji: '🐣' },
+        { section: '#regler', top: '60%', right: '8%', emoji: '🥚' },
+        { section: '#oppgaver', top: '20%', left: '2%', emoji: '🐰' },
+        { section: '#oppgaver', top: '70%', right: '3%', emoji: '🥚' },
+        { section: '#vurdering', top: '30%', right: '5%', emoji: '🐣' },
+        { section: '#tips', top: '50%', left: '4%', emoji: '🥚' },
+    ];
+
+    eggPositions.forEach((pos, i) => {
+        const section = document.querySelector(pos.section);
+        if (!section) return;
+        section.style.position = 'relative';
+        const egg = document.createElement('div');
+        egg.className = 'hidden-egg';
+        egg.textContent = pos.emoji;
+        egg.style.top = pos.top;
+        if (pos.left) egg.style.left = pos.left;
+        if (pos.right) egg.style.right = pos.right;
+        egg.addEventListener('click', () => {
+            if (egg.classList.contains('found')) return;
+            egg.classList.add('found');
+            eggsFound++;
+            document.getElementById('eggCount').textContent = eggsFound;
+            
+            // Confetti burst
+            const rect = egg.getBoundingClientRect();
+            const confettiEmojis = ['🥚', '🐣', '🌷', '🌸', '⭐', '🎉', '🐥'];
+            for (let j = 0; j < 8; j++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.textContent = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
+                c.style.left = (rect.left + Math.random() * 60 - 30) + 'px';
+                c.style.top = (rect.top - 10) + 'px';
+                c.style.animationDuration = (0.8 + Math.random() * 1) + 's';
+                c.style.transform = `translateX(${(Math.random() - 0.5) * 150}px)`;
+                document.body.appendChild(c);
+                setTimeout(() => c.remove(), 2000);
+            }
+
+            // Check if all found
+            if (eggsFound >= totalEggs) {
+                document.getElementById('eggCounter').classList.add('complete');
+                document.getElementById('eggCounter').innerHTML = '🐣 Alle egg funnet! God påske! 🎉';
+                // Big celebration
+                setTimeout(() => {
+                    for (let k = 0; k < 30; k++) {
+                        setTimeout(() => {
+                            const c = document.createElement('div');
+                            c.className = 'confetti';
+                            c.textContent = confettiEmojis[Math.floor(Math.random() * confettiEmojis.length)];
+                            c.style.left = Math.random() * window.innerWidth + 'px';
+                            c.style.top = '0px';
+                            c.style.fontSize = (1.5 + Math.random() * 1.5) + 'rem';
+                            c.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+                            document.body.appendChild(c);
+                            setTimeout(() => c.remove(), 4000);
+                        }, k * 80);
+                    }
+                }, 200);
+            }
+        });
+        section.appendChild(egg);
+    });
+</script>
+
+</body>
+</html>

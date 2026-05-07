@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🇳🇴 Dark Software Factory Workshop — Mai 2026</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0a0a14;
+            --bg-card: #111122;
+            --bg-card-hover: #181832;
+            --border: #252548;
+            --text: #f0eff8;
+            --text-muted: #9a96b8;
+            --red: #c0392b;
+            --red-light: #e74c3c;
+            --blue: #2e6eb5;
+            --blue-light: #4a90d9;
+            --gold: #d4a017;
+            --gold-light: #f0c040;
+            --ai-purple: #a855f7;
+            --ai-green: #34d399;
+            --radius: 16px;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ── Norwegian flag stripe ── */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg,
+                var(--red) 0%, var(--red) 35%,
+                #fff 35%, #fff 42%,
+                var(--blue) 42%, var(--blue) 58%,
+                #fff 58%, #fff 65%,
+                var(--red) 65%, var(--red) 100%);
+            z-index: 300;
+        }
+
+        /* ── Nav ── */
+        nav {
+            position: fixed;
+            top: 4px; left: 0; right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 20, 0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            transition: box-shadow 0.3s;
+        }
+        nav.scrolled { box-shadow: 0 4px 30px rgba(0,0,0,0.5); }
+        .nav-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 56px;
+        }
+        .nav-logo {
+            font-weight: 800; font-size: 1.05rem; color: var(--text);
+            display: flex; align-items: center; gap: 0.5rem; text-decoration: none;
+        }
+        .nav-links { display: flex; gap: 0.25rem; list-style: none; }
+        .nav-links a {
+            color: var(--text-muted); text-decoration: none;
+            font-size: 0.82rem; padding: 0.35rem 0.7rem; border-radius: 8px;
+            transition: all 0.2s; font-weight: 500;
+        }
+        .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+        .nav-toggle { display: none; background: none; border: none; color: var(--text); font-size: 1.4rem; cursor: pointer; }
+
+        @media (max-width: 768px) {
+            .nav-toggle { display: block; }
+            .nav-links {
+                display: none; position: absolute; top: 56px; left: 0; right: 0;
+                background: rgba(10,10,20,0.97); backdrop-filter: blur(20px);
+                flex-direction: column; padding: 1rem;
+                border-bottom: 1px solid var(--border);
+            }
+            .nav-links.open { display: flex; }
+        }
+
+        /* ── Sections ── */
+        section { max-width: 1000px; margin: 0 auto; padding: 5rem 2rem; }
+        .section-label {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-family: var(--mono); font-size: 0.78rem; color: var(--red-light);
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem;
+        }
+        .section-title {
+            font-size: 2.2rem; font-weight: 800; letter-spacing: -1px;
+            margin-bottom: 0.5rem; line-height: 1.2;
+        }
+        .section-subtitle {
+            color: var(--text-muted); font-size: 1.05rem;
+            margin-bottom: 3rem; max-width: 640px;
+        }
+
+        /* ── Hero ── */
+        .hero {
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; position: relative; padding-top: 80px;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; top: -10%; left: 50%; transform: translateX(-50%);
+            width: 800px; height: 800px;
+            background:
+                radial-gradient(circle at 30% 40%, rgba(192, 57, 43, 0.13) 0%, transparent 50%),
+                radial-gradient(circle at 70% 40%, rgba(46, 110, 181, 0.13) 0%, transparent 50%),
+                radial-gradient(circle at 50% 70%, rgba(240, 192, 64, 0.08) 0%, transparent 50%);
+            pointer-events: none; z-index: 0;
+        }
+        .hero > * { position: relative; z-index: 1; }
+
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(192, 57, 43, 0.1); border: 1px solid rgba(192, 57, 43, 0.25);
+            color: var(--red-light); padding: 0.4rem 1.2rem; border-radius: 100px;
+            font-size: 0.82rem; font-weight: 700; margin-bottom: 2rem; letter-spacing: 0.5px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.8rem, 7vw, 5.5rem);
+            font-weight: 900; letter-spacing: -3px; line-height: 1.0; margin-bottom: 0.5rem;
+        }
+        .hero h1 .gr-red {
+            background: linear-gradient(135deg, var(--red-light), #ff6b6b);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero h1 .gr-blue {
+            background: linear-gradient(135deg, var(--blue-light), var(--ai-purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .hero-hype {
+            max-width: 620px; margin: 1.2rem auto 0;
+            font-size: 1.15rem; color: var(--text-muted); line-height: 1.65;
+        }
+        .hero-hype strong { color: var(--text); }
+
+        .hero-stat-row {
+            display: flex; gap: 1rem; justify-content: center;
+            flex-wrap: wrap; margin: 2rem 0 2.5rem;
+        }
+        .hstat {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 0.9rem 1.4rem; text-align: center;
+        }
+        .hstat-num { font-size: 1.8rem; font-weight: 900; line-height: 1; }
+        .hstat-num.red { color: var(--red-light); }
+        .hstat-num.blue { color: var(--blue-light); }
+        .hstat-num.gold { color: var(--gold-light); }
+        .hstat-num.green { color: var(--ai-green); }
+        .hstat-label { font-size: 0.68rem; color: var(--text-muted); margin-top: 0.25rem; letter-spacing: 0.5px; }
+
+        .hero-ctas { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+        .cta-primary {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: linear-gradient(135deg, var(--red), var(--blue));
+            color: #fff; text-decoration: none; padding: 1rem 2.5rem;
+            border-radius: 100px; font-weight: 800; font-size: 1.05rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 25px rgba(192, 57, 43, 0.3);
+        }
+        .cta-primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 40px rgba(192,57,43,0.4); }
+
+        .cta-secondary {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            color: var(--text-muted); text-decoration: none; padding: 1rem 2rem;
+            border-radius: 100px; font-weight: 600; font-size: 1rem;
+            transition: all 0.2s;
+        }
+        .cta-secondary:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
+        .hero-meta {
+            margin-top: 2.5rem;
+            display: flex; gap: 2rem; justify-content: center;
+            flex-wrap: wrap; color: var(--text-muted); font-size: 0.88rem;
+        }
+        .hero-meta span { display: flex; align-items: center; gap: 0.4rem; }
+
+        /* ── Hype section ── */
+        .hype-box {
+            background: linear-gradient(135deg, rgba(192,57,43,0.06), rgba(46,110,181,0.06));
+            border: 1px solid rgba(192,57,43,0.15);
+            border-radius: var(--radius);
+            padding: 2.5rem 3rem;
+            position: relative; overflow: hidden;
+        }
+        .hype-box::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--red), #fff, var(--blue), #fff, var(--red));
+        }
+        .hype-quote {
+            font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px;
+            line-height: 1.4; margin-bottom: 1rem;
+        }
+        .hype-quote em { font-style: normal; color: var(--gold-light); }
+        .hype-sub { font-size: 0.95rem; color: var(--text-muted); max-width: 680px; }
+        .hype-sub strong { color: var(--text); }
+
+        .proof-row {
+            display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem;
+        }
+        .proof-chip {
+            background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+            border-radius: 100px; padding: 0.4rem 1rem;
+            font-size: 0.78rem; color: var(--text-muted);
+            display: flex; align-items: center; gap: 0.4rem;
+        }
+        .proof-chip .num { color: var(--ai-green); font-weight: 700; font-family: var(--mono); }
+
+        /* ── Section divider ── */
+        .section-divider {
+            max-width: 1000px; margin: 0 auto; text-align: center; position: relative; padding: 0.5rem 0;
+        }
+        .section-divider::before {
+            content: '';
+            position: absolute; left: 10%; right: 10%; top: 50%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+        }
+        .div-inner {
+            position: relative; z-index: 1; background: var(--bg);
+            display: inline-block; padding: 0 1rem;
+            font-size: 1.3rem; letter-spacing: 1.2rem; opacity: 0.65;
+        }
+
+        /* ── Cards ── */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 2rem;
+            transition: all 0.3s; position: relative; overflow: hidden;
+        }
+        .card:hover {
+            border-color: rgba(192,57,43,0.25); background: var(--bg-card-hover);
+            transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        .card-icon { font-size: 2rem; margin-bottom: 1rem; }
+        .card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
+        .card-new {
+            display: inline-block; background: rgba(168,85,247,0.12); color: var(--ai-purple);
+            font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem;
+            border-radius: 100px; margin-left: 0.5rem; vertical-align: middle; letter-spacing: 0.5px;
+        }
+
+        /* ── Timeline ── */
+        .timeline { position: relative; padding-left: 2rem; }
+        .timeline::before {
+            content: '';
+            position: absolute; left: 7px; top: 0; bottom: 0; width: 3px;
+            background: linear-gradient(to bottom, var(--red), #fff, var(--blue), var(--gold-light));
+            border-radius: 3px;
+        }
+        .timeline-item {
+            position: relative; margin-bottom: 2rem; padding-left: 1.5rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute; left: -1.65rem; top: 0.55rem;
+            width: 12px; height: 12px; background: var(--red);
+            border-radius: 50%; border: 2px solid var(--bg);
+        }
+        .timeline-item:nth-child(2)::before { background: #fff; }
+        .timeline-item:nth-child(3)::before { background: var(--blue); width: 14px; height: 14px; }
+        .timeline-item:nth-child(4)::before { background: var(--ai-purple); }
+        .timeline-item:nth-child(5)::before { background: var(--gold-light); }
+        .timeline-item:last-child::before { background: var(--ai-green); }
+        .timeline-time {
+            font-family: var(--mono); font-size: 0.82rem; color: var(--blue-light); font-weight: 700;
+        }
+        .timeline-title { font-size: 1.1rem; font-weight: 700; margin: 0.2rem 0; }
+        .timeline-desc { color: var(--text-muted); font-size: 0.88rem; }
+
+        /* ── Wrapped gifts ── */
+        .wrapped-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .wrapped-gift {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 2.5rem 2rem;
+            text-align: center; position: relative; overflow: hidden;
+            cursor: default; transition: all 0.4s;
+        }
+        .wrapped-gift:hover {
+            border-color: rgba(192,57,43,0.35);
+            transform: translateY(-4px) rotate(-0.5deg);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 30px rgba(192,57,43,0.08);
+        }
+        .wrapped-gift::before {
+            content: '';
+            position: absolute; top: 0; bottom: 0; left: 50%; width: 18px;
+            transform: translateX(-50%);
+            background: linear-gradient(180deg, var(--red) 0%, var(--red) 45%, #fff 45%, #fff 55%, var(--blue) 55%, var(--blue) 100%);
+            opacity: 0.25; z-index: 0;
+        }
+        .wrapped-gift::after {
+            content: '';
+            position: absolute; left: 0; right: 0; top: 50%; height: 18px;
+            transform: translateY(-50%);
+            background: linear-gradient(90deg, var(--red) 0%, var(--red) 45%, #fff 45%, #fff 55%, var(--blue) 55%, var(--blue) 100%);
+            opacity: 0.25; z-index: 0;
+        }
+        .wrapped-gift > * { position: relative; z-index: 1; }
+        .gift-bow { font-size: 3rem; margin-bottom: 0.8rem; display: block; animation: gentleBounce 3s ease-in-out infinite; }
+        .wrapped-gift:nth-child(2) .gift-bow { animation-delay: 0.5s; }
+        .wrapped-gift:nth-child(3) .gift-bow { animation-delay: 1s; }
+        @keyframes gentleBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        .gift-label { font-family: var(--mono); font-size: 0.7rem; color: var(--blue-light); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; margin-bottom: 0.4rem; }
+        .gift-title { font-size: 1.05rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .gift-mystery { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; }
+
+        .wrapped-teaser {
+            text-align: center; padding: 2rem;
+            background: rgba(192,57,43,0.04); border: 1px dashed rgba(192,57,43,0.2);
+            border-radius: var(--radius); margin-top: 0.5rem;
+        }
+        .wrapped-teaser h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 0.4rem; }
+        .wrapped-teaser p { color: var(--text-muted); font-size: 0.88rem; max-width: 520px; margin: 0 auto; }
+        .wrapped-hint {
+            display: inline-block; margin-top: 1rem; font-family: var(--mono);
+            font-size: 0.72rem; color: var(--red-light);
+            background: rgba(192,57,43,0.08); padding: 0.35rem 1rem; border-radius: 100px; letter-spacing: 0.5px;
+        }
+
+        /* ── Team grid ── */
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+        .team-item {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 1.5rem; text-align: center; transition: all 0.3s;
+        }
+        .team-item:hover { border-color: var(--blue-light); box-shadow: 0 0 20px rgba(74,144,217,0.1); transform: translateY(-3px); }
+        .team-item .ti { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .team-item h4 { font-size: 0.92rem; margin-bottom: 0.3rem; }
+        .team-item p { font-size: 0.78rem; color: var(--text-muted); }
+
+        /* ── Rules ── */
+        .rules-list { list-style: none; counter-reset: rule; }
+        .rules-list li {
+            counter-increment: rule; display: flex; gap: 1rem;
+            margin-bottom: 1.2rem; align-items: flex-start;
+        }
+        .rules-list li::before {
+            content: counter(rule); flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            width: 34px; height: 34px; background: var(--red); color: #fff;
+            font-weight: 800; font-size: 0.82rem; border-radius: 50%;
+        }
+        .rules-list li:nth-child(2)::before { background: var(--blue); }
+        .rules-list li:nth-child(3)::before { background: var(--ai-purple); }
+        .rules-list li:nth-child(4)::before { background: var(--gold-light); color: #1a1a2e; }
+        .rules-list li:nth-child(5)::before { background: var(--ai-green); color: #1a1a2e; }
+        .rule-text { font-size: 0.92rem; }
+        .rule-text strong { color: var(--text); }
+        .rule-text span { color: var(--text-muted); }
+
+        /* ── Pennant bunting ── */
+        .bunting { position: relative; width: 100%; height: 48px; overflow: hidden; margin: -1rem 0; }
+        .bunting-string { position: absolute; top: 10px; left: -2%; right: -2%; height: 2px; background: rgba(255,255,255,0.1); }
+        .pennant {
+            position: absolute; top: 10px; width: 24px; height: 32px;
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            animation: swayPennant 3s ease-in-out infinite alternate; transform-origin: top center;
+        }
+        @keyframes swayPennant { 0% { transform: rotate(-4deg); } 100% { transform: rotate(4deg); } }
+
+        /* ── Sekkeløp game ── */
+        .game-section {
+            background: linear-gradient(135deg, rgba(192,57,43,0.04), rgba(46,110,181,0.04));
+            border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 2.5rem; position: relative; overflow: hidden;
+        }
+        .game-section::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--red), #fff, var(--blue), #fff, var(--red));
+        }
+        .game-header { text-align: center; margin-bottom: 2rem; }
+        .game-header h3 { font-size: 1.6rem; font-weight: 900; margin-bottom: 0.3rem; }
+        .game-header p { color: var(--text-muted); font-size: 0.9rem; }
+        .game-track-container {
+            background: rgba(0,0,0,0.25); border-radius: 12px;
+            padding: 1.2rem 1.5rem; margin-bottom: 1.5rem; position: relative;
+        }
+        .game-finish-line {
+            position: absolute; right: 1.5rem; top: 0; bottom: 0; width: 3px;
+            background: repeating-linear-gradient(to bottom, #fff 0px, #fff 6px, #111 6px, #111 12px);
+            opacity: 0.5;
+        }
+        .game-lane { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem; height: 44px; position: relative; }
+        .game-lane:last-child { margin-bottom: 0; }
+        .game-lane-name { font-size: 0.72rem; font-family: var(--mono); color: var(--text-muted); width: 52px; flex-shrink: 0; text-align: right; }
+        .game-lane-track {
+            flex: 1; height: 38px; background: rgba(255,255,255,0.03); border-radius: 8px;
+            position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .game-lane:first-child .game-lane-track { border-color: rgba(231,76,60,0.2); background: rgba(231,76,60,0.04); }
+        .game-racer {
+            position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            font-size: 1.6rem; transition: left 0.15s ease-out;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); z-index: 2;
+        }
+        .game-racer.hopping { animation: hop 0.25s ease-out; }
+        @keyframes hop {
+            0% { transform: translateY(-50%) scale(1); }
+            35% { transform: translateY(-90%) scale(1.15) rotate(-8deg); }
+            70% { transform: translateY(-55%) scale(1.05) rotate(3deg); }
+            100% { transform: translateY(-50%) scale(1); }
+        }
+        .game-controls { display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+        .game-hop-btn {
+            background: linear-gradient(135deg, var(--red), var(--red-light));
+            color: #fff; border: none; padding: 1rem 3rem; border-radius: 100px;
+            font-size: 1.3rem; font-weight: 900; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;
+            box-shadow: 0 4px 20px rgba(192,57,43,0.3); user-select: none;
+        }
+        .game-hop-btn:hover { transform: scale(1.05); box-shadow: 0 6px 30px rgba(192,57,43,0.4); }
+        .game-hop-btn:active { transform: scale(0.95); }
+        .game-hop-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .game-timer { font-family: var(--mono); font-size: 1.8rem; font-weight: 700; color: var(--gold-light); min-width: 80px; text-align: center; }
+        .game-status { text-align: center; margin-top: 1rem; font-size: 0.88rem; color: var(--text-muted); min-height: 1.5em; }
+        .game-status.winner { color: var(--gold-light); font-weight: 700; font-size: 1.1rem; }
+        .game-best { text-align: center; margin-top: 0.8rem; font-size: 0.78rem; color: var(--text-muted); font-family: var(--mono); }
+        .game-reset-btn {
+            background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+            color: var(--text-muted); padding: 0.5rem 1.5rem; border-radius: 100px;
+            font-size: 0.82rem; cursor: pointer; transition: all 0.2s;
+        }
+        .game-reset-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+        .game-instructions { text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 1rem; opacity: 0.7; }
+
+        /* ── Footer ── */
+        footer { text-align: center; padding: 3rem 2rem; color: var(--text-muted); font-size: 0.78rem; border-top: 1px solid var(--border); }
+
+        /* ── Progress bar ── */
+        .progress-bar {
+            position: fixed; bottom: 0; left: 0; height: 3px;
+            background: linear-gradient(90deg, var(--red), #fff, var(--blue));
+            z-index: 200; transition: width 0.1s;
+        }
+
+        /* ── Floating flags ── */
+        .floating-flags {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .floating-flag {
+            position: absolute; opacity: 0.4;
+            animation: floatFlag linear infinite;
+            filter: drop-shadow(0 0 6px rgba(255,255,255,0.1));
+        }
+        @keyframes floatFlag { 0% { transform: translateY(110vh) rotate(0deg); } 100% { transform: translateY(-10vh) rotate(12deg); } }
+
+        /* ── Emoji rain on hero ── */
+        .emoji-rain { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+        .emoji-drop {
+            position: absolute; top: -40px;
+            animation: emojiDrop linear forwards; opacity: 0;
+        }
+        @keyframes emojiDrop {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            5% { opacity: 0.6; }
+            85% { opacity: 0.5; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* ── Confetti ── */
+        .mai-confetti {
+            position: fixed; pointer-events: none; z-index: 250; font-size: 1.5rem;
+            animation: confettiFall linear forwards;
+        }
+        @keyframes confettiFall {
+            0% { transform: translateY(-20px) rotate(0deg) scale(1); opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg) scale(0.5); opacity: 0; }
+        }
+
+        /* ── Animations ── */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(25px); } to { opacity: 1; transform: translateY(0); } }
+        .animate { opacity: 0; animation: fadeInUp 0.6s ease forwards; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+
+        /* ── Highlight box ── */
+        .highlight-box {
+            background: rgba(240,192,64,0.07); border: 1px solid rgba(240,192,64,0.2);
+            border-radius: var(--radius); padding: 1.5rem 2rem; margin-top: 1.5rem;
+        }
+        .highlight-box h4 { font-size: 0.95rem; color: var(--gold-light); margin-bottom: 0.5rem; }
+        .highlight-box p { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* ── Signup CTA ── */
+        .signup-box {
+            background: linear-gradient(135deg, rgba(192,57,43,0.08), rgba(46,110,181,0.08));
+            border: 1px solid rgba(192,57,43,0.2); border-radius: var(--radius);
+            padding: 3rem 2rem; text-align: center; position: relative; overflow: hidden;
+        }
+        .signup-box::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--red), #fff, var(--blue), #fff, var(--red));
+        }
+        .signup-box h2 { font-size: 2rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 0.5rem; }
+        .signup-box p { color: var(--text-muted); margin-bottom: 2rem; }
+        .signup-email {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            border-radius: 100px; padding: 0.8rem 1.5rem;
+            font-family: var(--mono); font-size: 0.9rem; color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        /* ── Tech badges ── */
+        .tech-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+        .tech-badge {
+            background: rgba(74,144,217,0.08); border: 1px solid rgba(74,144,217,0.15);
+            color: var(--text-muted); padding: 0.3rem 0.8rem; border-radius: 100px;
+            font-size: 0.78rem; font-weight: 500;
+        }
+
+        /* ── Learn items ── */
+        .learn-list { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem; }
+        .learn-item { display: flex; gap: 0.8rem; align-items: flex-start; font-size: 0.92rem; }
+        .learn-item .li-icon { flex-shrink: 0; font-size: 1.1rem; margin-top: 0.1rem; }
+        .learn-item p { color: var(--text-muted); }
+        .learn-item p strong { color: var(--text); }
+    </style>
+</head>
+<body>
+
+<div class="floating-flags" id="floatingFlags"></div>
+
+<!-- Nav -->
+<nav id="nav">
+    <div class="nav-inner">
+        <a href="#hero" class="nav-logo">🇳🇴 DSF Workshop — Mai 2026</a>
+        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Meny">&#9776;</button>
+        <ul class="nav-links">
+            <li><a href="#hype">Hype</a></li>
+            <li><a href="#program">Program</a></li>
+            <li><a href="#innhold">Innhold</a></li>
+            <li><a href="#hvem">Hvem</a></li>
+            <li><a href="#spill">Sekkeløp</a></li>
+            <li><a href="#paamelding">Meld deg på</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="hero">
+    <div class="emoji-rain" id="emojiRain"></div>
+    <div class="hero-badge animate">🇳🇴 Workshop · Mai 2026 · Dark Software Factory</div>
+    <h1 class="animate delay-1">
+        <span class="gr-red">Fabrikken</span><br>
+        er <span class="gr-blue">mørk.</span>
+    </h1>
+    <p class="hero-hype animate delay-2">
+        AI-agenter som planlegger, koder, tester og reviewer — <strong>uten at et menneske skriver én eneste linje.</strong>
+        Vi har kjørt eksperimentet. Nå viser vi deg resultatet, og du får prøve det selv.
+    </p>
+
+    <div class="hero-stat-row animate delay-3">
+        <div class="hstat">
+            <div class="hstat-num red">~33</div>
+            <div class="hstat-label">minutter · tom repo → service</div>
+        </div>
+        <div class="hstat">
+            <div class="hstat-num blue">47/47</div>
+            <div class="hstat-label">tester · alle grønne</div>
+        </div>
+        <div class="hstat">
+            <div class="hstat-num gold">100%</div>
+            <div class="hstat-label">holdout-evaluering</div>
+        </div>
+        <div class="hstat">
+            <div class="hstat-num green">0</div>
+            <div class="hstat-label">linjer skrevet av mennesker</div>
+        </div>
+    </div>
+
+    <div class="hero-ctas animate delay-4">
+        <a href="#paamelding" class="cta-primary">🇳🇴 Meld meg på!</a>
+        <a href="#hype" class="cta-secondary">Hva er DSF? ↓</a>
+    </div>
+
+    <div class="hero-meta animate delay-5">
+        <span>🇳🇴 Mai 2026</span>
+        <span>⏱ ~2 timer</span>
+        <span>📍 Sofakroken, KK1</span>
+        <span>🤖 Kjør fabrikken selv</span>
+        <span>🌭 Pølser, is og brus fra 15:45</span>
+    </div>
+</section>
+
+<div class="section-divider"><span class="div-inner">🇳🇴 🏭 🇳🇴</span></div>
+
+<!-- Hype -->
+<section id="hype">
+    <div class="section-label">⚡ Hvorfor nå</div>
+    <h2 class="section-title">Mens vi snakket om det, skjedde det</h2>
+    <p class="section-subtitle">StrongDM skriver ingen menneskelig kode lengre. Stripe pusher 1 300 AI-genererte PR-er per uke. Spotify: 650 per måned. Dette er ikke fremtiden — det er 2025.</p>
+
+    <div class="hype-box">
+        <div class="hype-quote">
+            AI som hjelper deg å kode er bra.<br>
+            En fabrikk som <em>koder for deg</em> er noe annet.
+        </div>
+        <p class="hype-sub">
+            <strong>Dark Software Factory (DSF)</strong> er et mønster der AI-agenter tar én setning fra et menneske og leverer ferdig, testet og reviewed kode — uten at et menneske ser på underveis.
+            Arkitekt-agent lager plan. Utvikler-agent koder. Review-agent og test-agent kjører parallelt. Eval-agent verifiserer mot en fasit agenten aldri har sett.
+            Vi har kjørt dette i et ekte eksperiment, og vi tar med oss resultatene til workshopen.
+        </p>
+        <div class="proof-row">
+            <div class="proof-chip"><span class="num">StrongDM</span> — ingen menneskekode siden juli 2025, i produksjon</div>
+            <div class="proof-chip"><span class="num">Stripe</span> — 1 300+ AI PR-er/uke</div>
+            <div class="proof-chip"><span class="num">Spotify</span> — 650 AI PR-er/mnd</div>
+            <div class="proof-chip"><span class="num">Cursor</span> — 70% av ny kode skrevet av AI</div>
+            <div class="proof-chip"><span class="num">$6</span> — kostnaden for eksperimentet vårt</div>
+        </div>
+    </div>
+
+    <!-- What you'll learn -->
+    <div style="margin-top: 3rem;">
+        <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">Hva du tar med deg hjem</h3>
+        <ul class="learn-list">
+            <li class="learn-item">
+                <span class="li-icon">🧠</span>
+                <p><strong>Forståelse av DSF-arkitekturen</strong> — CLAUDE.md som kontrakt, holdout-scenarioer som fasit, hooks som kvalitetsporter. Ikke teori: du ser det kjøre.</p>
+            </li>
+            <li class="learn-item">
+                <span class="li-icon">⚙️</span>
+                <p><strong>Hands-on erfaring med agent-pipeline</strong> — du kjører en ekte DSF-fabrikk selv og legger til en ny compliance-regel. Fabrikken planlegger, koder, tester og reviewer.</p>
+            </li>
+            <li class="learn-item">
+                <span class="li-icon">🤔</span>
+                <p><strong>Et ærlig bilde av hva dette betyr for rollen vår</strong> — hvem eier feilen? Hva skjer med junior-opplæring? Hva er igjen for oss? Vi diskuterer, ikke preker.</p>
+            </li>
+            <li class="learn-item">
+                <span class="li-icon">🍽️</span>
+                <p><strong>Pølser, is og brus</strong> — fra 15:45 før vi starter. Prat. Ro til å fordøye (eksistensielle spørsmål om karrieren din er forventet).</p>
+            </li>
+        </ul>
+    </div>
+</section>
+
+<div class="bunting" id="bunting1"></div>
+<div class="section-divider"><span class="div-inner">🇳🇴 🏭 🇳🇴</span></div>
+
+<!-- Program -->
+<section id="program">
+    <div class="section-label">⏱ Program</div>
+    <h2 class="section-title">Dagens program</h2>
+    <p class="section-subtitle">Møt opp kl. 15:45 — pølser, is og brus klart. Workshop starter 16:00. Slutt ~18:20. 🌭🍦</p>
+
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="timeline-time">15:45</div>
+            <div class="timeline-title">🌭 Pølser, is og brus</div>
+            <div class="timeline-desc">Kom tidlig, slå deg ned, prat med folk. Mat klart fra start — spis mens du kan.</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-time">16:00 – 16:20</div>
+            <div class="timeline-title">🎤 Velkommen + "Hva er DSF?"</div>
+            <div class="timeline-desc">Kontekst: hvorfor nå, hva vi har bygget, hva de store gjør. Live-demo: 33 minutter som 5 minutter. Ingen kode skrives av et menneske.</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-time">16:20 – 16:30</div>
+            <div class="timeline-title">⚙️ Velg spor + sett opp repo</div>
+            <div class="timeline-desc">Tre spor med ulik vanskelighetsgrad. Du velger ditt nivå. Alle får repo + API-nøkkel. Klar til å kjøre.</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-time">16:30 – 17:45</div>
+            <div class="timeline-title">🏭 Kjør fabrikken!</div>
+            <div class="timeline-desc">Du kjører din egen DSF-pipeline. Legg til en compliance-regel — uten å skrive koden selv. Se agentene planlegge, kode, reviewe og teste. Fasilitator er tilgjengelig for feilsøking.</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-time">17:45 – 18:10</div>
+            <div class="timeline-title">💬 Diskusjon</div>
+            <div class="timeline-desc">Hva overrasket deg? Hva gikk galt? Hvem eier feilen? Hva skjer med juniorer? Åpen diskusjon — ingen fasit, mange meninger.</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-time">18:10 – 18:20</div>
+            <div class="timeline-title">🏆 Demo og oppsummering</div>
+            <div class="timeline-desc">Vis hva fabrikken din produserte. Hvem fikk mest ut av minst input? Kort oppsummering og veien videre.</div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"><span class="div-inner">🇳🇴 🏭 🇳🇴</span></div>
+
+<!-- Innhold / spor -->
+<section id="innhold">
+    <div class="section-label">📦 Workshop-spor</div>
+    <h2 class="section-title">Tre nivåer — én fabrikk</h2>
+    <p class="section-subtitle">Du velger ditt spor på dagen. Alle kjører samme pipeline — bare med ulik grad av selvstendighet. Sporet avdukes på workshopen!</p>
+
+    <div class="wrapped-grid">
+        <div class="wrapped-gift">
+            <span class="gift-bow">🎁</span>
+            <div class="gift-label">Spor 1</div>
+            <div class="gift-title">🟢 Grunnleggende</div>
+            <div class="gift-mystery">Copy-paste-prompts. Følg med. Se fabrikken gjøre alt. ~45 min.</div>
+        </div>
+        <div class="wrapped-gift">
+            <span class="gift-bow">🎁</span>
+            <div class="gift-label">Spor 2</div>
+            <div class="gift-title">🟡 Avansert</div>
+            <div class="gift-mystery">Skriv din egen spec. Se hva som skjer med vag vs. presis tekst. ~55 min.</div>
+        </div>
+        <div class="wrapped-gift">
+            <span class="gift-bow">🎁</span>
+            <div class="gift-label">Spor 3</div>
+            <div class="gift-title">🟣 Factory</div>
+            <div class="gift-mystery">Skriv fasiten FØR koden. Det ekte DSF-prinsippet. ~55 min.</div>
+        </div>
+    </div>
+
+    <div class="wrapped-teaser">
+        <span style="font-size: 2.5rem; display: block; margin-bottom: 0.8rem;">🏭</span>
+        <h3>Alle spor — én pipeline</h3>
+        <p>Arkitekt-agent lager plan. Utvikler-agent koder. Review + Test kjører parallelt. Eval-agent verifiserer. Alle fasene, alle hookene, all jobben — utført av agenter. Du evaluerer output.</p>
+        <span class="wrapped-hint">🔒 Fullt program avdukes under briefingen kl. 16:00</span>
+    </div>
+
+    <div class="highlight-box">
+        <h4>💡 Hva du kjøres på</h4>
+        <p>Et ekte .NET 10 compliance-API med agentkjørte tester, CI/CD og holdout-evaluering. Du legger til en ny forretningsregel — fabrikken implementerer den. Alternativ: Docker-versjon for de uten lokal SDK.</p>
+    </div>
+</section>
+
+<div class="section-divider"><span class="div-inner">🇳🇴 🏭 🇳🇴</span></div>
+
+<!-- Hvem / Ha med -->
+<section id="hvem">
+    <div class="section-label">👥 Hvem og hva</div>
+    <h2 class="section-title">Hvem passer dette for?</h2>
+    <p class="section-subtitle">Utviklere, tech leads og nysgjerrige — alle som vil forstå hvor AI-drevet utvikling faktisk er på vei.</p>
+
+    <div class="team-grid">
+        <div class="team-item">
+            <div class="ti">👨‍💻</div>
+            <h4>Utviklere</h4>
+            <p>Se hva agenter faktisk leverer — og hva de ikke klarer uten presis spec.</p>
+        </div>
+        <div class="team-item">
+            <div class="ti">🎯</div>
+            <h4>Tech leads</h4>
+            <p>Hva betyr dette for teamprosesser, code review og accountability?</p>
+        </div>
+        <div class="team-item">
+            <div class="ti">🌱</div>
+            <h4>Juniorer</h4>
+            <p>Lærer du fortsatt å kode godt uten å skrive kode? La oss finne ut.</p>
+        </div>
+        <div class="team-item">
+            <div class="ti">🤔</div>
+            <h4>Skeptikere</h4>
+            <p>Velkomne. Faktisk spesielt velkomne. Vi viser, du vurderer.</p>
+        </div>
+    </div>
+
+    <div style="margin-top: 2.5rem;">
+        <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem;">Ha dette klart på dagen</h3>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon">💻</div>
+                <h3>Laptop</h3>
+                <p>Med Claude Code installert. Terminal som fungerer. Gjerne VS Code eller Cursor.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🐙</div>
+                <h3>GitHub-konto</h3>
+                <p>For å klone repo og committe. Gratis på github.com.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🔑</div>
+                <h3>API-nøkkel <span class="card-new">DELES UT</span></h3>
+                <p>Du trenger en Claude-nøkkel. Vi deler ut ved oppstart — du trenger ikke skaffe selv.</p>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 1.5rem;">
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0.8rem;">Valgfritt — men gjør deg enda bedre forberedt:</p>
+        <div class="tech-badges">
+            <span class="tech-badge">Claude Code CLI installert</span>
+            <span class="tech-badge">Docker Desktop</span>
+            <span class="tech-badge">.NET 10 SDK</span>
+            <span class="tech-badge">gh CLI</span>
+            <span class="tech-badge">Python 3 (for agent monitor)</span>
+        </div>
+    </div>
+
+    <div style="margin-top: 2rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem 2rem;">
+        <h4 style="font-size: 1rem; margin-bottom: 1rem;">Spilleregler</h4>
+        <ol class="rules-list">
+            <li>
+                <div class="rule-text">
+                    <strong>Du skriver ingen kode</strong><br>
+                    <span>Agentene gjør det. Jobben din er å skrive intent og evaluere output.</span>
+                </div>
+            </li>
+            <li>
+                <div class="rule-text">
+                    <strong>API-nøkler holdes hemmelig</strong><br>
+                    <span>I .env-filer. Aldri commit dem. Vi passer på kostnadstak.</span>
+                </div>
+            </li>
+            <li>
+                <div class="rule-text">
+                    <strong>CI feiler — det er forventet</strong><br>
+                    <span>CI-feil er input til dev-agenten, ikke en stoppesituasjon. Se hvordan fabrikken fikser seg selv.</span>
+                </div>
+            </li>
+            <li>
+                <div class="rule-text">
+                    <strong>Still spørsmål</strong><br>
+                    <span>Det er ingen dumme spørsmål her. Alle møter dette for første gang.</span>
+                </div>
+            </li>
+        </ol>
+    </div>
+</section>
+
+<div class="bunting" id="bunting2"></div>
+<div class="section-divider"><span class="div-inner">🇳🇴 🏭 🇳🇴</span></div>
+
+<!-- Sekkeløp game -->
+<section id="spill">
+    <div class="game-section">
+        <div class="game-header">
+            <h3>🏃 Sekkeløp! 🏃</h3>
+            <p>Mens du venter på fabrikken — klassisk 17. mai-lek. Slå AI-motstanderne til mål!</p>
+        </div>
+        <div class="game-track-container">
+            <div class="game-finish-line"></div>
+            <div class="game-lane">
+                <div class="game-lane-name">DU</div>
+                <div class="game-lane-track"><div class="game-racer" id="racer-player">🏃</div></div>
+            </div>
+            <div class="game-lane">
+                <div class="game-lane-name">Claude</div>
+                <div class="game-lane-track"><div class="game-racer" id="racer-ai1">🤖</div></div>
+            </div>
+            <div class="game-lane">
+                <div class="game-lane-name">Kari</div>
+                <div class="game-lane-track"><div class="game-racer" id="racer-ai2">🏄</div></div>
+            </div>
+        </div>
+        <div class="game-controls">
+            <div class="game-timer" id="gameTimer">0.00s</div>
+            <button class="game-hop-btn" id="hopBtn">🇳🇴 HOPP!</button>
+            <button class="game-reset-btn" id="resetBtn" style="display:none;">Spill igjen</button>
+        </div>
+        <div class="game-status" id="gameStatus">Trykk HOPP! for å starte</div>
+        <div class="game-best" id="gameBest"></div>
+        <div class="game-instructions">Tast <kbd style="background:rgba(255,255,255,0.1);padding:0.1rem 0.4rem;border-radius:4px;">mellomrom</kbd> eller klikk for å hoppe. Førstemann i mål!</div>
+    </div>
+</section>
+
+<div class="bunting" id="bunting3"></div>
+<div class="section-divider"><span class="div-inner">🇳🇴 🏭 🇳🇴</span></div>
+
+<!-- Påmelding -->
+<section id="paamelding">
+    <div class="signup-box">
+        <h2>🇳🇴 Meld deg på!</h2>
+        <p>Begrenset plasser — maks ~20 deltakere for å sikre god fasilitatordekning. First come, first served.</p>
+        <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.7;">
+            Send en melding til Lars eller svar på invitasjonen. Ta med en <strong>kort setning</strong> om hva du håper å få ut av det — da kan vi tilpasse sporene bedre.
+        </div>
+        <a href="#" class="cta-primary" style="font-size: 1rem;">🇳🇴 Jeg er med!</a>
+        <p style="margin-top: 1.5rem; font-size: 0.75rem; color: var(--text-muted);">Dato og endelig sted bekreftes nærmere. Pølser, is og brus fra 15:45 — inkludert.</p>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <p style="font-size: 1.8rem; margin-bottom: 1rem;">🇳🇴 🏭 🤖 ⚙️ 🇳🇴</p>
+    <p style="margin-bottom: 0.5rem; font-size: 0.95rem; color: var(--red-light);">Dark Software Factory Workshop — Mai 2026</p>
+    <p style="margin-bottom: 0.5rem;">Fabrikken er mørk. Ingen trenger å være til stede. Men du bør være der.</p>
+    <p style="font-size: 0.72rem; margin-top: 1rem; color: var(--text-muted);">Pølser, is og brus fra 15:45. Eksistensielle spørsmål om karrieren er forventet. 🌭🍦</p>
+</footer>
+
+<!-- Scroll progress -->
+<div class="progress-bar" id="progress"></div>
+
+<script>
+    const maiEmojis = ['🇳🇴','🌭','🍦','🎺','🥁','🎈','🎉','⚙️','🏭','🤖','🔧','⭐','💙','❤️','🤍'];
+
+    // Scroll progress + nav shadow
+    window.addEventListener('scroll', () => {
+        const h = document.documentElement;
+        document.getElementById('progress').style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100 + '%';
+        document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    document.querySelectorAll('.nav-links a').forEach(a => {
+        a.addEventListener('click', () => document.querySelector('.nav-links').classList.remove('open'));
+    });
+
+    // Intersection observer fade-in
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.card, .team-item, .timeline-item, .tip-card, .hype-box, .wrapped-gift, .learn-item').forEach(el => {
+        el.style.opacity = '0'; el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        observer.observe(el);
+    });
+
+    // Floating flags
+    const flagContainer = document.getElementById('floatingFlags');
+    for (let i = 0; i < 28; i++) {
+        const f = document.createElement('div');
+        f.className = 'floating-flag';
+        f.textContent = maiEmojis[Math.floor(Math.random() * maiEmojis.length)];
+        f.style.left = Math.random() * 100 + '%';
+        f.style.animationDuration = (18 + Math.random() * 30) + 's';
+        f.style.animationDelay = (Math.random() * 20) + 's';
+        f.style.fontSize = (1.4 + Math.random() * 2) + 'rem';
+        flagContainer.appendChild(f);
+    }
+
+    // Hero emoji rain
+    const emojiRain = document.getElementById('emojiRain');
+    function spawnDrop() {
+        const d = document.createElement('div');
+        d.className = 'emoji-drop';
+        d.textContent = maiEmojis[Math.floor(Math.random() * maiEmojis.length)];
+        d.style.left = Math.random() * 100 + '%';
+        d.style.fontSize = (1.5 + Math.random() * 2) + 'rem';
+        d.style.animationDuration = (6 + Math.random() * 7) + 's';
+        emojiRain.appendChild(d);
+        setTimeout(() => d.remove(), 14000);
+    }
+    for (let i = 0; i < 10; i++) setTimeout(() => spawnDrop(), i * 500);
+    setInterval(spawnDrop, 2200);
+
+    // Pennant bunting
+    function createBunting(id) {
+        const c = document.getElementById(id);
+        if (!c) return;
+        const s = document.createElement('div'); s.className = 'bunting-string'; c.appendChild(s);
+        const colors = ['#c0392b','#ffffff','#2e6eb5','#f0c040','#c0392b','#ffffff','#2e6eb5','#c0392b'];
+        const count = Math.floor((c.offsetWidth || window.innerWidth) / 38);
+        for (let i = 0; i < count; i++) {
+            const p = document.createElement('div');
+            p.className = 'pennant';
+            p.style.left = (i / count * 100) + '%';
+            p.style.background = colors[i % colors.length];
+            p.style.animationDelay = (i * 0.15) + 's';
+            p.style.opacity = '0.85';
+            c.appendChild(p);
+        }
+    }
+    createBunting('bunting1'); createBunting('bunting2'); createBunting('bunting3');
+
+    // Confetti burst
+    function burstConfetti(x, y, n) {
+        for (let i = 0; i < n; i++) {
+            const c = document.createElement('div');
+            c.className = 'mai-confetti';
+            c.textContent = maiEmojis[Math.floor(Math.random() * maiEmojis.length)];
+            c.style.left = (x + (Math.random() - 0.5) * 180) + 'px';
+            c.style.top = (y - 20) + 'px';
+            c.style.fontSize = (1 + Math.random() * 1.5) + 'rem';
+            c.style.animationDuration = (2 + Math.random() * 2) + 's';
+            document.body.appendChild(c);
+            setTimeout(() => c.remove(), 5000);
+        }
+    }
+
+    // ── Sekkeløp game ──
+    const FINISH = 92;
+    let playerPos = 0, ai1Pos = 0, ai2Pos = 0;
+    let gameStarted = false, gameRunning = false, gameOver = false;
+    let startTime = 0, timerInterval = null, ai1Interval = null, ai2Interval = null;
+
+    const racerPlayer = document.getElementById('racer-player');
+    const racerAi1 = document.getElementById('racer-ai1');
+    const racerAi2 = document.getElementById('racer-ai2');
+    const hopBtn    = document.getElementById('hopBtn');
+    const resetBtn  = document.getElementById('resetBtn');
+    const timerEl   = document.getElementById('gameTimer');
+    const statusEl  = document.getElementById('gameStatus');
+    const bestEl    = document.getElementById('gameBest');
+
+    let bestTime = localStorage.getItem('dsf-sekkeløp-best') ? parseFloat(localStorage.getItem('dsf-sekkeløp-best')) : null;
+    if (bestTime) bestEl.textContent = 'Bestetid: ' + bestTime.toFixed(2) + 's';
+
+    function setPos(el, pos) { el.style.left = Math.min(pos, FINISH) + '%'; }
+    function triggerHop(el) { el.classList.remove('hopping'); void el.offsetWidth; el.classList.add('hopping'); }
+
+    function startGame() {
+        gameStarted = gameRunning = true; gameOver = false;
+        startTime = performance.now();
+        statusEl.textContent = 'HOPP HOPP HOPP!'; statusEl.className = 'game-status';
+        resetBtn.style.display = 'none';
+        timerInterval = setInterval(() => { timerEl.textContent = ((performance.now() - startTime) / 1000).toFixed(2) + 's'; }, 50);
+        ai1Interval = setInterval(() => {
+            if (!gameRunning) return;
+            ai1Pos = Math.min(ai1Pos + 1.5 + Math.random() * 3, FINISH);
+            setPos(racerAi1, ai1Pos); triggerHop(racerAi1);
+            if (ai1Pos >= FINISH) checkWinner('Claude');
+        }, 290 + Math.random() * 100);
+        ai2Interval = setInterval(() => {
+            if (!gameRunning) return;
+            ai2Pos = Math.min(ai2Pos + 2 + Math.random() * 3.5, FINISH);
+            setPos(racerAi2, ai2Pos); triggerHop(racerAi2);
+            if (ai2Pos >= FINISH) checkWinner('Kari');
+        }, 230 + Math.random() * 140);
+    }
+
+    function checkWinner(who) {
+        if (gameOver) return;
+        gameOver = true; gameRunning = false;
+        clearInterval(timerInterval); clearInterval(ai1Interval); clearInterval(ai2Interval);
+        const elapsed = (performance.now() - startTime) / 1000;
+        if (who === 'player') {
+            statusEl.textContent = '🏆 DU VANT! ' + elapsed.toFixed(2) + 's 🏆';
+            statusEl.className = 'game-status winner';
+            if (!bestTime || elapsed < bestTime) {
+                bestTime = elapsed;
+                localStorage.setItem('dsf-sekkeløp-best', bestTime.toFixed(2));
+                bestEl.textContent = '⭐ Ny bestetid: ' + bestTime.toFixed(2) + 's!';
+            }
+            const rect = hopBtn.getBoundingClientRect();
+            burstConfetti(rect.left + rect.width / 2, rect.top, 28);
+            setTimeout(() => burstConfetti(window.innerWidth / 2, window.innerHeight / 3, 20), 400);
+        } else {
+            statusEl.textContent = who + ' vant! Gi ikke opp 💪';
+        }
+        hopBtn.disabled = true; resetBtn.style.display = '';
+    }
+
+    function playerHop() {
+        if (gameOver) return;
+        if (!gameStarted) startGame();
+        if (!gameRunning) return;
+        playerPos = Math.min(playerPos + 2.5 + Math.random() * 3.5, FINISH);
+        setPos(racerPlayer, playerPos); triggerHop(racerPlayer);
+        if (playerPos >= FINISH) checkWinner('player');
+    }
+
+    function resetGame() {
+        playerPos = ai1Pos = ai2Pos = 0; gameStarted = gameRunning = gameOver = false;
+        clearInterval(timerInterval); clearInterval(ai1Interval); clearInterval(ai2Interval);
+        setPos(racerPlayer, 0); setPos(racerAi1, 0); setPos(racerAi2, 0);
+        timerEl.textContent = '0.00s';
+        statusEl.textContent = 'Trykk HOPP! for å starte'; statusEl.className = 'game-status';
+        hopBtn.disabled = false; resetBtn.style.display = 'none';
+        if (bestTime) bestEl.textContent = 'Bestetid: ' + bestTime.toFixed(2) + 's';
+    }
+
+    hopBtn.addEventListener('click', playerHop);
+    resetBtn.addEventListener('click', resetGame);
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && !e.repeat) {
+            e.preventDefault();
+            gameOver ? resetGame() : playerHop();
+        }
+    });
+</script>
+</body>
+</html>

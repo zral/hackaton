@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Software Factory — Workshop</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #080810;
+            --bg-card: #0e0e1a;
+            --bg-card-hover: #141428;
+            --border: #1e1e38;
+            --text: #e8e6f8;
+            --text-muted: #888aaa;
+            --amber: #f59e0b;
+            --amber-light: #fbbf24;
+            --amber-glow: rgba(245, 158, 11, 0.2);
+            --green: #10b981;
+            --green-light: #34d399;
+            --green-glow: rgba(16, 185, 129, 0.2);
+            --cyan: #06b6d4;
+            --cyan-light: #22d3ee;
+            --cyan-glow: rgba(6, 182, 212, 0.15);
+            --red: #ef4444;
+            --red-light: #f87171;
+            --purple: #a855f7;
+            --purple-light: #c084fc;
+            --radius: 16px;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ── Factory warning stripe ── */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--amber) 0px, var(--amber) 16px,
+                #111 16px, #111 24px
+            );
+            z-index: 300;
+        }
+
+        /* ── Nav ── */
+        nav {
+            position: fixed;
+            top: 4px; left: 0; right: 0;
+            z-index: 100;
+            background: rgba(8, 8, 16, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            transition: box-shadow 0.3s;
+        }
+        nav.scrolled { box-shadow: 0 4px 30px rgba(0,0,0,0.6), 0 0 60px rgba(245,158,11,0.03); }
+        .nav-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 56px;
+        }
+        .nav-logo {
+            font-weight: 800; font-size: 1rem;
+            color: var(--amber); letter-spacing: -0.3px;
+            display: flex; align-items: center; gap: 0.5rem;
+            text-decoration: none;
+        }
+        .nav-links { display: flex; gap: 0.25rem; list-style: none; }
+        .nav-links a {
+            color: var(--text-muted); text-decoration: none;
+            font-size: 0.82rem; padding: 0.35rem 0.7rem; border-radius: 8px;
+            transition: all 0.2s; font-weight: 500;
+        }
+        .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+        .nav-toggle { display: none; background: none; border: none; color: var(--text); font-size: 1.4rem; cursor: pointer; }
+
+        @media (max-width: 768px) {
+            .nav-toggle { display: block; }
+            .nav-links {
+                display: none; position: absolute; top: 56px; left: 0; right: 0;
+                background: rgba(8,8,16,0.97); backdrop-filter: blur(20px);
+                flex-direction: column; padding: 1rem;
+                border-bottom: 1px solid var(--border);
+            }
+            .nav-links.open { display: flex; }
+        }
+
+        /* ── Sections ── */
+        section { max-width: 1000px; margin: 0 auto; padding: 5rem 2rem; }
+        .section-label {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-family: var(--mono); font-size: 0.78rem; color: var(--amber);
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem;
+        }
+        .section-title {
+            font-size: 2.2rem; font-weight: 800; letter-spacing: -1px;
+            margin-bottom: 0.5rem; line-height: 1.2;
+        }
+        .section-subtitle {
+            color: var(--text-muted); font-size: 1.05rem;
+            margin-bottom: 3rem; max-width: 640px;
+        }
+
+        /* ── Hero ── */
+        .hero {
+            min-height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; position: relative; padding-top: 80px;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; top: -10%; left: 50%; transform: translateX(-50%);
+            width: 900px; height: 900px;
+            background: radial-gradient(circle at 30% 40%, rgba(245,158,11,0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 40%, rgba(6,182,212,0.06) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 70%, rgba(168,85,247,0.06) 0%, transparent 50%);
+            pointer-events: none; z-index: 0;
+        }
+        .hero > * { position: relative; z-index: 1; }
+
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2);
+            color: var(--amber); padding: 0.4rem 1.2rem; border-radius: 100px;
+            font-size: 0.82rem; font-weight: 700; margin-bottom: 2rem;
+            letter-spacing: 1px; font-family: var(--mono);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.8rem, 7vw, 5rem); font-weight: 900;
+            letter-spacing: -2px; line-height: 1.0; margin-bottom: 0.5rem;
+        }
+        .hero h1 .gradient-amber {
+            background: linear-gradient(135deg, var(--amber), var(--amber-light), var(--green));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero h1 .gradient-dark {
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .hero-sub {
+            font-size: 1.15rem; color: var(--text-muted);
+            max-width: 580px; margin: 1rem auto 2rem;
+        }
+
+        .hero-stats {
+            display: flex; gap: 2rem; justify-content: center;
+            flex-wrap: wrap; margin-bottom: 2.5rem;
+        }
+        .stat-box {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 1rem 1.5rem; text-align: center;
+            min-width: 110px;
+        }
+        .stat-number { font-size: 2rem; font-weight: 900; line-height: 1; }
+        .stat-number.amber { color: var(--amber); }
+        .stat-number.green { color: var(--green); }
+        .stat-number.cyan { color: var(--cyan); }
+        .stat-number.red { color: var(--red); }
+        .stat-label { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.3rem; letter-spacing: 0.5px; }
+
+        .hero-cta {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: linear-gradient(135deg, var(--amber), #d97706);
+            color: #000; text-decoration: none;
+            padding: 1rem 2.5rem; border-radius: 100px;
+            font-weight: 800; font-size: 1.05rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 25px rgba(245,158,11,0.3);
+        }
+        .hero-cta:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 40px rgba(245,158,11,0.4);
+        }
+
+        .hero-terminal {
+            margin-top: 2.5rem;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 1.5rem 2rem;
+            font-family: var(--mono); font-size: 0.82rem;
+            color: var(--text-muted); text-align: left;
+            max-width: 580px; width: 100%;
+        }
+        .t-comment { color: #444; font-style: italic; }
+        .t-prompt { color: var(--green); }
+        .t-cmd { color: var(--text); }
+        .t-success { color: var(--green); }
+        .t-ai { color: var(--purple); }
+        .t-amber { color: var(--amber); }
+
+        /* ── Dividers ── */
+        .section-divider {
+            max-width: 1000px; margin: 0 auto;
+            text-align: center; position: relative; padding: 0.5rem 0;
+        }
+        .section-divider::before {
+            content: '';
+            position: absolute; left: 10%; right: 10%; top: 50%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+        }
+        .divider-inner {
+            position: relative; z-index: 1;
+            background: var(--bg); display: inline-block; padding: 0 1rem;
+            font-size: 1.1rem; letter-spacing: 1.2rem; opacity: 0.6;
+        }
+
+        /* ── Cards ── */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 2rem;
+            transition: all 0.3s; position: relative; overflow: hidden;
+        }
+        .card:hover {
+            border-color: rgba(245,158,11,0.25); background: var(--bg-card-hover);
+            transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        }
+        .card-icon { font-size: 1.8rem; margin-bottom: 1rem; }
+        .card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .card p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; }
+        .card-tag {
+            display: inline-block; background: rgba(245,158,11,0.1); color: var(--amber);
+            font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.6rem;
+            border-radius: 100px; margin-top: 1rem; letter-spacing: 0.5px;
+        }
+
+        /* ── Maturity ladder ── */
+        .ladder-container { margin-top: 2rem; overflow-x: auto; }
+        .ladder {
+            display: flex; gap: 0; min-width: 600px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); overflow: hidden;
+        }
+        .ladder-step {
+            flex: 1; padding: 1.2rem 1rem; text-align: center;
+            border-right: 1px solid var(--border); transition: all 0.3s;
+            position: relative;
+        }
+        .ladder-step:last-child { border-right: none; }
+        .ladder-step.current {
+            background: rgba(245,158,11,0.08);
+            border-color: rgba(245,158,11,0.2);
+        }
+        .ladder-step.future { opacity: 0.4; }
+        .step-num {
+            font-family: var(--mono); font-size: 0.7rem; color: var(--text-muted);
+            letter-spacing: 1px; margin-bottom: 0.4rem; display: block;
+        }
+        .step-name { font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem; }
+        .step-human { font-size: 0.7rem; color: var(--text-muted); }
+        .ladder-step.current .step-name { color: var(--amber); }
+        .ladder-step.current .step-human { color: var(--amber-light); font-weight: 600; }
+        .current-badge {
+            position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+            background: var(--amber); color: #000; font-size: 0.58rem; font-weight: 800;
+            padding: 0.15rem 0.5rem; border-radius: 0 0 6px 6px; letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        /* ── Principle cards ── */
+        .principle-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 2.5rem;
+            margin-bottom: 1.5rem; position: relative; overflow: hidden;
+        }
+        .principle-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        }
+        .p1::before { background: linear-gradient(90deg, var(--amber), var(--amber-light)); }
+        .p2::before { background: linear-gradient(90deg, var(--red), var(--purple)); }
+        .p3::before { background: linear-gradient(90deg, var(--cyan), var(--green)); }
+        .p4::before { background: linear-gradient(90deg, var(--purple), var(--cyan)); }
+        .p5::before { background: linear-gradient(90deg, var(--green), var(--amber)); }
+
+        .principle-num {
+            font-family: var(--mono); font-size: 0.7rem; color: var(--amber);
+            font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 0.5rem;
+        }
+        .principle-card h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 0.3rem; }
+        .principle-card .tagline { color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1.2rem; }
+
+        .hook-list { list-style: none; display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+        .hook-item {
+            background: rgba(6,182,212,0.08); border: 1px solid rgba(6,182,212,0.15);
+            color: var(--cyan-light); padding: 0.3rem 0.8rem; border-radius: 8px;
+            font-family: var(--mono); font-size: 0.75rem;
+        }
+
+        .info-box {
+            background: rgba(16,185,129,0.06); border-left: 3px solid var(--green);
+            padding: 0.8rem 1rem; border-radius: 0 8px 8px 0;
+            font-size: 0.85rem; color: var(--green-light); margin-top: 1rem;
+        }
+        .warn-box {
+            background: rgba(239,68,68,0.06); border-left: 3px solid var(--red);
+            padding: 0.8rem 1rem; border-radius: 0 8px 8px 0;
+            font-size: 0.85rem; color: var(--red-light); margin-top: 1rem;
+        }
+
+        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1.2rem 0; }
+        .agent-card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+            border-radius: 12px; padding: 1rem;
+        }
+        .agent-card .agent-icon { font-size: 1.5rem; margin-bottom: 0.4rem; }
+        .agent-card h4 { font-size: 0.88rem; font-weight: 700; margin-bottom: 0.2rem; }
+        .agent-card p { font-size: 0.75rem; color: var(--text-muted); }
+
+        /* ── Pipeline visualizer ── */
+        .pipeline-viz {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 2rem; margin-top: 2rem;
+        }
+        .pipeline-viz h3 { font-size: 1.1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+
+        .pipeline-steps {
+            display: flex; align-items: stretch; gap: 0;
+            flex-wrap: nowrap; overflow-x: auto;
+        }
+        .pipeline-step {
+            flex: 1; min-width: 120px;
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1rem 0.8rem; text-align: center;
+            position: relative; margin-right: 2rem; transition: all 0.5s;
+        }
+        .pipeline-step:last-child { margin-right: 0; }
+        .pipeline-step::after {
+            content: '→';
+            position: absolute; right: -1.6rem; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); font-size: 1rem; font-weight: 700;
+        }
+        .pipeline-step:last-child::after { display: none; }
+        .pipeline-step.active {
+            border-color: var(--amber);
+            background: rgba(245,158,11,0.08);
+            box-shadow: 0 0 20px rgba(245,158,11,0.1);
+        }
+        .pipeline-step.done {
+            border-color: var(--green);
+            background: rgba(16,185,129,0.06);
+        }
+        .pipeline-step.done .ps-icon { filter: none; }
+        .ps-icon { font-size: 1.6rem; margin-bottom: 0.4rem; display: block; }
+        .ps-name { font-size: 0.72rem; font-weight: 700; }
+        .ps-status {
+            font-size: 0.62rem; font-family: var(--mono); color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+        .pipeline-step.done .ps-status { color: var(--green); }
+        .pipeline-step.active .ps-status { color: var(--amber); }
+        .pipeline-step.blocked { border-color: var(--red); background: rgba(239,68,68,0.06); }
+        .pipeline-step.blocked .ps-status { color: var(--red); }
+
+        .run-btn {
+            background: linear-gradient(135deg, var(--amber), #d97706);
+            color: #000; border: none; padding: 0.7rem 2rem;
+            border-radius: 100px; font-weight: 800; font-size: 0.9rem;
+            cursor: pointer; margin-top: 1.5rem; transition: all 0.2s;
+            display: block; width: fit-content;
+        }
+        .run-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,158,11,0.3); }
+        .run-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .factory-log {
+            margin-top: 1rem; background: rgba(0,0,0,0.4); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1rem; font-family: var(--mono);
+            font-size: 0.75rem; min-height: 4rem; line-height: 1.8;
+            max-height: 120px; overflow-y: auto;
+        }
+
+        /* ── Demo results ── */
+        .demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .demo-stat {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 1.5rem; text-align: center;
+        }
+        .demo-stat .big { font-size: 2.5rem; font-weight: 900; line-height: 1; }
+        .demo-stat .big.amber { color: var(--amber); }
+        .demo-stat .big.green { color: var(--green); }
+        .demo-stat .big.cyan { color: var(--cyan); }
+        .demo-stat .big.red { color: var(--red); }
+        .demo-stat .label { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.4rem; }
+
+        /* Review findings ── */
+        .findings-list { list-style: none; margin-top: 1.5rem; }
+        .finding-item {
+            display: flex; gap: 1rem; padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 0.85rem; align-items: flex-start;
+        }
+        .finding-sev {
+            flex-shrink: 0; font-family: var(--mono); font-size: 0.7rem;
+            font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 4px;
+            margin-top: 0.1rem;
+        }
+        .sev-high { background: rgba(239,68,68,0.15); color: var(--red-light); }
+        .sev-mod { background: rgba(245,158,11,0.12); color: var(--amber-light); }
+        .sev-low { background: rgba(16,185,129,0.1); color: var(--green-light); }
+        .sev-info { background: rgba(168,85,247,0.1); color: var(--purple-light); }
+        .finding-text { color: var(--text-muted); flex: 1; }
+        .finding-phase { font-family: var(--mono); font-size: 0.7rem; color: var(--cyan); flex-shrink: 0; margin-top: 0.1rem; }
+
+        /* ── Track cards ── */
+        .track-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 2.5rem; margin-bottom: 1.5rem;
+            position: relative; overflow: hidden; transition: all 0.3s;
+        }
+        .track-card:hover {
+            border-color: rgba(245,158,11,0.2); background: var(--bg-card-hover);
+            transform: translateY(-2px);
+        }
+        .track-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        }
+        .track-card:nth-child(1)::before { background: linear-gradient(90deg, var(--green), var(--cyan)); }
+        .track-card:nth-child(2)::before { background: linear-gradient(90deg, var(--amber), var(--red)); }
+        .track-card:nth-child(3)::before { background: linear-gradient(90deg, var(--purple), var(--amber)); }
+
+        .track-num {
+            font-family: var(--mono); font-size: 0.7rem; color: var(--cyan);
+            font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 0.5rem;
+        }
+        .track-card h3 { font-size: 1.35rem; font-weight: 800; margin-bottom: 0.3rem; }
+        .track-card .track-tagline { color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1.2rem; }
+
+        .track-features { list-style: none; margin-bottom: 1rem; }
+        .track-features li {
+            padding: 0.3rem 0; padding-left: 1.5rem; position: relative;
+            font-size: 0.88rem; color: var(--text-muted);
+        }
+        .track-features li::before {
+            content: '▸'; position: absolute; left: 0;
+            color: var(--green); font-weight: bold;
+        }
+
+        .track-time {
+            display: inline-block; background: rgba(245,158,11,0.1);
+            border: 1px solid rgba(245,158,11,0.2); color: var(--amber);
+            font-family: var(--mono); font-size: 0.72rem; font-weight: 700;
+            padding: 0.25rem 0.8rem; border-radius: 100px; margin-right: 0.5rem;
+        }
+
+        .code-snippet {
+            background: rgba(0,0,0,0.4); border: 1px solid var(--border);
+            border-radius: 8px; padding: 1rem 1.2rem; margin-top: 1rem;
+            font-family: var(--mono); font-size: 0.78rem; color: var(--text-muted); line-height: 1.7;
+            overflow-x: auto;
+        }
+        .code-snippet .kw { color: var(--purple); }
+        .code-snippet .str { color: var(--green); }
+        .code-snippet .cm { color: #444; font-style: italic; }
+        .code-snippet .prop { color: var(--cyan); }
+
+        /* ── Repo cards ── */
+        .repo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+        .repo-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 2rem;
+            display: flex; flex-direction: column; gap: 0.8rem;
+            transition: all 0.3s;
+        }
+        .repo-card:hover {
+            border-color: rgba(245,158,11,0.25); transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        .repo-title { font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+        .repo-desc { font-size: 0.85rem; color: var(--text-muted); }
+        .repo-tag {
+            display: inline-block; background: rgba(6,182,212,0.1);
+            color: var(--cyan); font-size: 0.72rem; font-weight: 600;
+            padding: 0.2rem 0.6rem; border-radius: 100px;
+        }
+        .repo-link {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2);
+            color: var(--amber); font-family: var(--mono); font-size: 0.78rem; font-weight: 600;
+            padding: 0.4rem 0.9rem; border-radius: 8px; text-decoration: none;
+            transition: all 0.2s; margin-top: 0.3rem; width: fit-content;
+        }
+        .repo-link:hover { background: rgba(245,158,11,0.18); }
+
+        /* ── Discussion ── */
+        .discussion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .disc-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 1.8rem;
+            transition: all 0.3s;
+        }
+        .disc-card:hover {
+            border-color: rgba(168,85,247,0.2); transform: translateY(-2px);
+        }
+        .disc-num {
+            font-family: var(--mono); font-size: 2rem; font-weight: 900;
+            color: rgba(255,255,255,0.06); line-height: 1; margin-bottom: 0.8rem;
+        }
+        .disc-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--purple-light); }
+        .disc-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+
+        /* ── CLAUDE.md preview ── */
+        .claude-preview {
+            background: rgba(0,0,0,0.5); border: 1px solid var(--amber);
+            border-radius: var(--radius); padding: 2rem; margin-top: 1.5rem;
+            font-family: var(--mono); font-size: 0.78rem; line-height: 1.8;
+            position: relative; overflow: hidden;
+        }
+        .claude-preview::before {
+            content: '📄 CLAUDE.md';
+            display: block; font-weight: 700; color: var(--amber);
+            margin-bottom: 1rem; font-size: 0.85rem;
+        }
+        .md-h2 { color: var(--cyan-light); font-weight: 700; }
+        .md-table-head { color: var(--amber); }
+        .md-rule { color: var(--green-light); }
+        .md-value { color: var(--text-muted); }
+        .md-comment { color: #444; font-style: italic; }
+
+        /* ── Tips ── */
+        .tip-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 1.4rem 1.8rem;
+            margin-bottom: 0.8rem; display: flex; gap: 1rem; align-items: flex-start;
+            transition: all 0.3s;
+        }
+        .tip-card:hover { border-color: rgba(245,158,11,0.2); box-shadow: 0 0 20px rgba(245,158,11,0.05); }
+        .tip-icon { flex-shrink: 0; font-size: 1.3rem; margin-top: 0.1rem; }
+        .tip-card h4 { font-size: 0.92rem; margin-bottom: 0.2rem; font-weight: 700; }
+        .tip-card p { font-size: 0.82rem; color: var(--text-muted); }
+
+        /* ── Footer ── */
+        footer {
+            text-align: center; padding: 3rem 2rem;
+            color: var(--text-muted); font-size: 0.78rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* ── Progress bar ── */
+        .progress-bar {
+            position: fixed; bottom: 0; left: 0; height: 3px;
+            background: linear-gradient(90deg, var(--amber), var(--green), var(--cyan), var(--purple));
+            z-index: 200; transition: width 0.1s;
+        }
+
+        /* ── Floating gears ── */
+        .bg-particles {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .bg-particle {
+            position: absolute; opacity: 0.12;
+            animation: floatParticle linear infinite;
+        }
+        @keyframes floatParticle {
+            0% { transform: translateY(110vh) rotate(0deg); }
+            100% { transform: translateY(-10vh) rotate(360deg); }
+        }
+
+        /* ── Animations ── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate { opacity: 0; animation: fadeInUp 0.6s ease forwards; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+
+        /* ── Hidden factory workers (click game) ── */
+        .hidden-worker {
+            position: absolute; font-size: 1.6rem; cursor: pointer;
+            opacity: 0.12; z-index: 50; transition: all 0.3s;
+            filter: grayscale(0.5);
+        }
+        .hidden-worker:hover { opacity: 0.5; filter: grayscale(0); transform: scale(1.2); }
+        .hidden-worker.found {
+            opacity: 1 !important; filter: grayscale(0) !important;
+            transform: scale(1.5) !important; animation: workerFound 0.5s ease;
+        }
+        @keyframes workerFound {
+            0% { transform: scale(1); }
+            50% { transform: scale(2) rotate(15deg); }
+            100% { transform: scale(1.5) rotate(0); }
+        }
+
+        /* ── Worker counter ── */
+        .worker-counter {
+            position: fixed; bottom: 1.5rem; right: 1.5rem;
+            background: rgba(14,14,26,0.9); backdrop-filter: blur(10px);
+            border: 1px solid var(--amber); border-radius: 100px;
+            padding: 0.6rem 1.2rem; font-size: 0.82rem; color: var(--amber);
+            font-weight: 700; z-index: 200;
+            display: flex; align-items: center; gap: 0.5rem;
+            box-shadow: 0 4px 20px rgba(245,158,11,0.12); transition: all 0.3s;
+        }
+        .worker-counter.complete { border-color: var(--green); color: var(--green); }
+
+        /* ── Confetti ── */
+        .confetti-piece {
+            position: fixed; pointer-events: none; z-index: 300;
+            font-size: 1.3rem; animation: confettiFall linear forwards;
+        }
+        @keyframes confettiFall {
+            0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100vh) rotate(480deg); opacity: 0; }
+        }
+
+        /* ── Industry examples ── */
+        .industry-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+        .industry-item {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 1.2rem; transition: all 0.3s;
+        }
+        .industry-item:hover { border-color: rgba(6,182,212,0.2); transform: translateY(-2px); }
+        .industry-item .company { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.3rem; }
+        .industry-item .fact { font-size: 0.82rem; color: var(--cyan-light); font-weight: 600; margin-bottom: 0.2rem; }
+        .industry-item .detail { font-size: 0.75rem; color: var(--text-muted); }
+
+        /* ── Slide navigation ── */
+        .slide-nav {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(8, 8, 16, 0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 0.5rem 0.8rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+        }
+        .slide-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .slide-btn:hover:not(:disabled) {
+            border-color: var(--amber);
+            color: var(--amber);
+            background: rgba(245,158,11,0.1);
+        }
+        .slide-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+        .slide-info {
+            display: flex; flex-direction: column; align-items: center;
+            min-width: 120px;
+        }
+        .slide-counter {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            color: var(--amber);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .slide-name {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
+        }
+        .slide-dots {
+            display: flex; gap: 4px; align-items: center;
+        }
+        .slide-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .slide-dot.active {
+            background: var(--amber);
+            width: 14px;
+            border-radius: 3px;
+        }
+
+        /* Comparison table */
+        .compare-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; font-size: 0.85rem; }
+        .compare-table th, .compare-table td {
+            padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border);
+        }
+        .compare-table th { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 600; }
+        .compare-table td:first-child { color: var(--text-muted); font-weight: 500; font-size: 0.8rem; }
+        .compare-table td:nth-child(n+2) { color: var(--text); }
+        .compare-table tr:hover td { background: rgba(255,255,255,0.01); }
+    </style>
+</head>
+<body>
+
+<!-- Background particles -->
+<div class="bg-particles" id="bgParticles"></div>
+
+<!-- Navigation -->
+<nav id="nav">
+    <div class="nav-inner">
+        <a href="#hero" class="nav-logo">⚙️ Dark Software Factory</a>
+        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Meny">&#9776;</button>
+        <ul class="nav-links">
+            <li><a href="#bakgrunn">Bakgrunn</a></li>
+            <li><a href="#prinsipper">Prinsipper</a></li>
+            <li><a href="#demo">Demo</a></li>
+            <li><a href="#oppgaver">Oppgaver</a></li>
+            <li><a href="#repos">Repos</a></li>
+            <li><a href="#diskusjon">Diskusjon</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="hero">
+    <div class="hero-badge animate">⚙️ DSF EXPERIMENT · WORKSHOP 2026</div>
+    <h1 class="animate delay-1">Dark Software<br><span class="gradient-amber">Factory</span></h1>
+    <p class="hero-sub animate delay-2">Autonom, agentdrevet utvikling — og hva det gjør med oss som utviklere. Fabrikken er mørk. Ingen trenger å være til stede.</p>
+
+    <div class="hero-stats animate delay-3">
+        <div class="stat-box">
+            <div class="stat-number amber">~33</div>
+            <div class="stat-label">min · tom repo til service</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number green">47/47</div>
+            <div class="stat-label">tester · alle grønne</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number cyan">100%</div>
+            <div class="stat-label">holdout · første forsøk</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number red">0</div>
+            <div class="stat-label">linjer skrevet av mennesker</div>
+        </div>
+    </div>
+
+    <a href="#oppgaver" class="hero-cta animate delay-4">⚙️ Start fabrikken ↓</a>
+
+    <div class="hero-terminal animate delay-5">
+        <span class="t-comment"># DSF-syklusen i ett grep</span><br>
+        <span class="t-prompt">$</span> <span class="t-cmd">claude --dangerously-skip-permissions</span><br>
+        <span class="t-ai">[Orchestrator]</span> <span class="t-amber">Plan ✓</span> → <span class="t-amber">Impl/QC ✓</span> → <span class="t-amber">Holdout ✓</span> → <span class="t-amber">Commit ✓</span><br>
+        <span class="t-success">✓</span> 4 regler, CI, .NET 10 · 47/47 tester · 5/5 holdout<br>
+        <span class="t-success">✓</span> Kost: ~$6 · Tid: ~33 min · Menneskelinjer: 0
+    </div>
+</section>
+
+<div class="section-divider"><span class="divider-inner">⚙️ 🏭 ⚙️</span></div>
+
+<!-- Bakgrunn -->
+<section id="bakgrunn">
+    <div class="section-label">01 · Bakgrunn</div>
+    <h2 class="section-title">Hva er en Dark Software Factory?</h2>
+    <p class="section-subtitle">Mennesket definerer <em>hva</em> og <em>hvorfor</em>. Orkestratoren koordinerer. Agentene produserer. Fabrikken er mørk — ingen trenger å være til stede.</p>
+
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-icon">🧠</div>
+            <h3>Mennesket gir intent</h3>
+            <p>Én løs setning. Agentene skriver plan, scenarioer, kode, review og analyse — alt. Det er det eneste mennesket leverer.</p>
+            <div class="card-tag">~ 1 setning</div>
+        </div>
+        <div class="card">
+            <div class="card-icon">🤖</div>
+            <h3>Agentpipeline</h3>
+            <p>Arkitekt → Utvikler → Review + Test (parallelt) → Eval → Commit. Hvert steg blokkeres av hooks om kvalitetsporten ikke passerer.</p>
+            <div class="card-tag">5 agentroller</div>
+        </div>
+        <div class="card">
+            <div class="card-icon">🔒</div>
+            <h3>Holdout-barriere</h3>
+            <p>Fasiten skrives FØR koden starter. Eval-agenten ser aldri koden — bare API + scenarioer. Blokkerer ved &lt; 80% satisfaction.</p>
+            <div class="card-tag">train/test split</div>
+        </div>
+        <div class="card">
+            <div class="card-icon">🔄</div>
+            <h3>Selvevolverende</h3>
+            <p>Hvert review-funn → ny regel i SKILL.md → neste agent unngår feilen automatisk. Fabrikken blir smartere for hvert kjør.</p>
+            <div class="card-tag">continuous improvement</div>
+        </div>
+    </div>
+
+    <div style="margin-top: 2.5rem;">
+        <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Industrial reality — ikke en hypotese</h3>
+        <div class="industry-grid">
+            <div class="industry-item">
+                <div class="company">StrongDM</div>
+                <div class="fact">Ingen menneskeskrevet kode siden juli 2025</div>
+                <div class="detail">I produksjon</div>
+            </div>
+            <div class="industry-item">
+                <div class="company">Spotify</div>
+                <div class="fact">650 AI-genererte PR-er/mnd</div>
+                <div class="detail">Aktiv storskala bruk</div>
+            </div>
+            <div class="industry-item">
+                <div class="company">Stripe</div>
+                <div class="fact">1 300+ AI PR-er/uke</div>
+                <div class="detail">Og stigende</div>
+            </div>
+            <div class="industry-item">
+                <div class="company">Cursor</div>
+                <div class="fact">70% av ny kode skrevet av AI</div>
+                <div class="detail">I eget produkt</div>
+            </div>
+            <div class="industry-item">
+                <div class="company">Dette eksperimentet</div>
+                <div class="fact">~33 min · $6 · 47/47 tester</div>
+                <div class="detail">Fra tom repo til produksjonsklar service</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Maturity ladder -->
+    <div style="margin-top: 2.5rem;">
+        <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Hvor på modenhetsstigen er vi?</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">Fra autofullføring til full autonomi — og hvor grensen for menneskelig intent går.</p>
+        <div class="ladder-container">
+            <div class="ladder">
+                <div class="ladder-step">
+                    <span class="step-num">STEG 1</span>
+                    <div class="step-name">Manuell</div>
+                    <div class="step-human">100% menneske</div>
+                </div>
+                <div class="ladder-step">
+                    <span class="step-num">STEG 2</span>
+                    <div class="step-name">Autofullføring</div>
+                    <div class="step-human">~80% menneske</div>
+                </div>
+                <div class="ladder-step">
+                    <span class="step-num">STEG 3</span>
+                    <div class="step-name">Chat-drevet</div>
+                    <div class="step-human">~60% menneske</div>
+                </div>
+                <div class="ladder-step">
+                    <span class="step-num">STEG 4</span>
+                    <div class="step-name">Agent i IDE</div>
+                    <div class="step-human">~40% menneske</div>
+                </div>
+                <div class="ladder-step">
+                    <span class="step-num">STEG 5</span>
+                    <div class="step-name">Orkestrert agent</div>
+                    <div class="step-human">~20% menneske</div>
+                </div>
+                <div class="ladder-step current">
+                    <span class="current-badge">📍 DENNE WORKSHOPEN</span>
+                    <span class="step-num">STEG 6</span>
+                    <div class="step-name">DSF</div>
+                    <div class="step-human">~1 setning</div>
+                </div>
+                <div class="ladder-step future">
+                    <span class="step-num">STEG 7</span>
+                    <div class="step-name">Full autonomi</div>
+                    <div class="step-human">Ikke her — ennå</div>
+                </div>
+            </div>
+        </div>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.8rem;">Steg 6 vs 7: I DSF leverer mennesket én løs setning — AI skriver alt annet, inkl. plan, scenarioer, kode, review og analyse. Det som skiller steg 6 fra 7: mennesket bestemmer fortsatt hva som bygges.</p>
+    </div>
+</section>
+
+<div class="section-divider"><span class="divider-inner">⚙️ 🏭 ⚙️</span></div>
+
+<!-- Prinsipper -->
+<section id="prinsipper">
+    <div class="section-label">02 · Prinsipper</div>
+    <h2 class="section-title">Fem byggeklosser</h2>
+    <p class="section-subtitle">Hele fabrikken hviler på fem prinsipper. Fjern én — og kvalitetsgarantien ryker.</p>
+
+    <!-- P1: CLAUDE.md -->
+    <div class="principle-card p1">
+        <div class="principle-num">Prinsipp 01</div>
+        <h3>CLAUDE.md — Kontrakten</h3>
+        <p class="tagline">Brifingen til en senior utvikler som starter dag én. Bedre CLAUDE.md → bedre output.</p>
+
+        <div class="claude-preview">
+<span class="md-h2">## Compliance-regler</span>
+<span class="md-table-head">| Regel                      | Status          | Kort versjon         |</span>
+<span class="md-table-head">|---------------------------|-----------------|----------------------|</span>
+<span class="md-rule">| `amount_threshold`</span>         <span class="md-value">| Flagged   | > 100 000 NOK  |</span>
+<span class="md-rule">| `sanctioned_country`</span>       <span class="md-value">| Rejected  | KP/IR/SY/CU/RU |</span>
+<span class="md-rule">| `pep_check`</span>                <span class="md-value">| PendingReview  | PEP + > 50k NOK |</span>
+
+<span class="md-h2">## Etablerte beslutninger (ikke til diskusjon)</span>
+<span class="md-value">- Beløp alltid `long` (øre) — aldri `decimal`</span>
+<span class="md-value">- 200 OK for screening — ikke 201</span>
+<span class="md-value">- `IScreeningRule` er kontrakten</span>
+
+<span class="md-h2">## Ikke-forhandlbare regler</span>
+<span class="md-value">- ALDRI implementer uten plan</span>
+<span class="md-value">- ALDRI la orkestrøren skrive kode</span>
+<span class="md-value">- ALLTID kjør review og test parallelt</span>
+        </div>
+        <div class="info-box">💡 Å forbedre CLAUDE.md er det høyest-verdiskaping et menneske gjør. Det er fabrikkens instruksjonsmanual.</div>
+    </div>
+
+    <!-- P2: Holdout -->
+    <div class="principle-card p2">
+        <div class="principle-num">Prinsipp 02</div>
+        <h3>Holdout-scenarioer — Fasiten</h3>
+        <p class="tagline">Train/test-separasjon — det samme prinsippet som i maskinlæring. Fasiten skrives FØR koden starter.</p>
+
+        <div class="agent-grid">
+            <div class="agent-card">
+                <div class="agent-icon">👨‍💻</div>
+                <h4>Dev-agent</h4>
+                <p>Ser CLAUDE.md + src/ + doc/<br>Skriver kode — aldri scenarioer</p>
+            </div>
+            <div class="agent-card" style="border-color: rgba(239,68,68,0.3);">
+                <div class="agent-icon">🔐</div>
+                <h4>.claudeignore</h4>
+                <p>Blokkerer dev-agent fra å lese scenarios/<br>Automatisk indeksering blokkert</p>
+            </div>
+            <div class="agent-card">
+                <div class="agent-icon">🧪</div>
+                <h4>Eval-agent</h4>
+                <p>Ser scenarios/ + kjørende API<br>Aldri kildekoden</p>
+            </div>
+        </div>
+
+        <div class="warn-box">⚠️ StrongDM oppdaget: Agenter som ser testene skriver kode som jukser — inkl. <code>return true</code>. Holdout løser dette.</div>
+        <div class="info-box">✅ Eksempel output: 01-amount-threshold → Flagged ✓ · 04-cumulative → Approved ✗ Flagged · Score: 4/5 = 80% → GODKJENT</div>
+    </div>
+
+    <!-- P3: Pipeline + Hooks -->
+    <div class="principle-card p3">
+        <div class="principle-num">Prinsipp 03</div>
+        <h3>Agentpipeline og hooks</h3>
+        <p class="tagline">5 steg. Steg 2 er hjertet: QC-løkken som ikke kan hoppes over.</p>
+
+        <div class="pipeline-viz">
+            <h3>🏭 Agentfabrikken — kjør det selv</h3>
+            <div class="pipeline-steps" id="pipelineSteps">
+                <div class="pipeline-step" data-step="0">
+                    <span class="ps-icon">📐</span>
+                    <div class="ps-name">Plan</div>
+                    <div class="ps-status">venter</div>
+                </div>
+                <div class="pipeline-step" data-step="1">
+                    <span class="ps-icon">💻</span>
+                    <div class="ps-name">Impl</div>
+                    <div class="ps-status">venter</div>
+                </div>
+                <div class="pipeline-step" data-step="2">
+                    <span class="ps-icon">🔍</span>
+                    <div class="ps-name">QC ×2</div>
+                    <div class="ps-status">venter</div>
+                </div>
+                <div class="pipeline-step" data-step="3">
+                    <span class="ps-icon">🧪</span>
+                    <div class="ps-name">Holdout</div>
+                    <div class="ps-status">venter</div>
+                </div>
+                <div class="pipeline-step" data-step="4">
+                    <span class="ps-icon">📦</span>
+                    <div class="ps-name">Commit</div>
+                    <div class="ps-status">venter</div>
+                </div>
+                <div class="pipeline-step" data-step="5">
+                    <span class="ps-icon">📊</span>
+                    <div class="ps-name">Analyse</div>
+                    <div class="ps-status">venter</div>
+                </div>
+            </div>
+            <button class="run-btn" id="runPipelineBtn">⚙️ Start fabrikken!</button>
+            <div class="factory-log" id="factoryLog" style="color: var(--text-muted);">Klar til å kjøre...</div>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0.8rem;">Hooks — kvalitetsporter som ikke kan omgås:</p>
+            <ul class="hook-list">
+                <li class="hook-item">require-plan.sh</li>
+                <li class="hook-item">require-phase-qc.sh</li>
+                <li class="hook-item">require-review.sh</li>
+                <li class="hook-item">require-analyse.sh</li>
+            </ul>
+        </div>
+        <div class="warn-box">🚫 Hooks blokkerer skriving til src/ uten plan. Blokkerer commit uten review-verdict. Blokkerer neste fase uten APPROVED QC. Kan ikke omgås.</div>
+    </div>
+
+    <!-- P4: Selvevolverende -->
+    <div class="principle-card p4">
+        <div class="principle-num">Prinsipp 04</div>
+        <h3>Selvevolverende ferdigheter</h3>
+        <p class="tagline">Hvert review-funn → ny regel i SKILL.md → neste agent unngår feilen automatisk.</p>
+
+        <div class="card-grid" style="margin-top: 1rem;">
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+                <p style="font-size: 0.8rem; color: var(--green-light); font-weight: 700; margin-bottom: 0.4rem;">✓ Syklus 1 → Syklus 2</p>
+                <p style="font-size: 0.78rem; color: var(--text-muted);">snake_case regelnavnet → lagt til SKILL.md → Syklus 2 korrekt automatisk</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+                <p style="font-size: 0.8rem; color: var(--green-light); font-weight: 700; margin-bottom: 0.4rem;">✓ 0 review-funn</p>
+                <p style="font-size: 0.78rem; color: var(--text-muted);">RuleStatus.Pass/Flag → Passed/Triggered → lagt til SKILL.md → 0 funn i Syklus 2</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 1rem;">
+                <p style="font-size: 0.8rem; color: var(--green-light); font-weight: 700; margin-bottom: 0.4rem;">✓ 80+ gotchas</p>
+                <p style="font-size: 0.78rem; color: var(--text-muted);">Prosjektspesifikke regler akkumulert etter 9 iterasjoner — ny service unngår kjente feil fra dag én</p>
+            </div>
+        </div>
+        <div class="info-box">⟳ Fabrikken: Feature ferdig → Analyse automatisk skrevet → AI leser analyse → Skills oppdatert → Neste feature starter med forbedret kontekst</div>
+    </div>
+
+    <!-- P5: Directory structure -->
+    <div class="principle-card p5">
+        <div class="principle-num">Prinsipp 05</div>
+        <h3>Tre lag — tre eiere</h3>
+        <p class="tagline">Infrastruktur fra mennesker, fasit fra orkestrøren, output fra fabrikken.</p>
+
+        <table class="compare-table">
+            <thead>
+                <tr><th>Lag</th><th>Filer</th><th>Hvem eier</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>CLAUDE.md</td><td>Kontrakten med fabrikken. Stack, regler, protokoll.</td><td>Menneske</td></tr>
+                <tr><td>.claude/skills/</td><td>5 agentroller: arkitekt, utvikler, reviewer, tester, eval</td><td>Bootstrap AI → evolution AI</td></tr>
+                <tr><td>scenarios/</td><td>Holdout fasit i klartekst. Skrevet FØR kode.</td><td>Orkestrør</td></tr>
+                <tr><td>.claude/hooks/</td><td>require-plan, require-phase-qc, require-review, require-analyse</td><td>Bootstrap AI → evolves</td></tr>
+                <tr><td>src/ + tests/</td><td>ALL kode, ALL konfigurasjon, GitHub Actions CI/CD</td><td>Agent 100%</td></tr>
+            </tbody>
+        </table>
+        <div class="warn-box">«Hvis et menneske skriver i src/ — er ikke fabrikken mørk.»</div>
+    </div>
+</section>
+
+<div class="section-divider"><span class="divider-inner">⚙️ 🏭 ⚙️</span></div>
+
+<!-- Demo -->
+<section id="demo">
+    <div class="section-label">03 · Demo</div>
+    <h2 class="section-title">Hva fabrikken leverte</h2>
+    <p class="section-subtitle">~33 min · 4 regler · 47/47 tester · 5/5 holdout · 0 linjer skrevet av mennesker</p>
+
+    <div class="demo-grid">
+        <div class="demo-stat">
+            <div class="big amber">~33</div>
+            <div class="label">minutter total syklustid</div>
+        </div>
+        <div class="demo-stat">
+            <div class="big green">47/47</div>
+            <div class="label">tester passerte</div>
+        </div>
+        <div class="demo-stat">
+            <div class="big cyan">5/5</div>
+            <div class="label">holdout-scenarioer</div>
+        </div>
+        <div class="demo-stat">
+            <div class="big red">0</div>
+            <div class="label">produksjonslinjer av mennesker</div>
+        </div>
+    </div>
+
+    <h3 style="font-size: 1.05rem; margin-bottom: 0.5rem; margin-top: 1rem;">10 review-funn — alle fanget FØR holdout</h3>
+    <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">Review-agenten fant kritiske feil. Utvikler-agenten fikset dem. Slik er det ment å fungere.</p>
+
+    <ul class="findings-list">
+        <li class="finding-item">
+            <span class="finding-phase">F3</span>
+            <span class="finding-sev sev-high">HIGH</span>
+            <span class="finding-text">Ingen input-validering på POST — negative verdier og nullverdier passerte gjennom</span>
+        </li>
+        <li class="finding-item">
+            <span class="finding-phase">F1</span>
+            <span class="finding-sev sev-mod">MOD</span>
+            <span class="finding-text">Mutable string[] i sanksjonert landliste</span>
+        </li>
+        <li class="finding-item">
+            <span class="finding-phase">F2</span>
+            <span class="finding-sev sev-mod">MOD</span>
+            <span class="finding-text">Ingen landkodevalidering på regelnivå</span>
+        </li>
+        <li class="finding-item">
+            <span class="finding-phase">F3</span>
+            <span class="finding-sev sev-low">LOW</span>
+            <span class="finding-text">Død null-guard — ureachable etter filter ble lagt til</span>
+        </li>
+        <li class="finding-item">
+            <span class="finding-phase">F2</span>
+            <span class="finding-sev sev-low">LOW</span>
+            <span class="finding-text">UTC midnight race — to uavhengige UtcNow-kall</span>
+        </li>
+        <li class="finding-item">
+            <span class="finding-phase">F4</span>
+            <span class="finding-sev sev-info">INFO</span>
+            <span class="finding-text">FakeDailyLimitStore manglet AddCallCount — dårlig testkvalitet</span>
+        </li>
+    </ul>
+
+    <div class="info-box" style="margin-top: 1.5rem;">🔍 Dyreste: F3 validering — 2 QC-runder. Rotårsak: Minimal API ignorerer [Required] på records. → Lagt til developer/SKILL.md etter kjøret. Neste syklus: dette problemet eksisterer ikke.</div>
+</section>
+
+<div class="section-divider"><span class="divider-inner">⚙️ 🏭 ⚙️</span></div>
+
+<!-- Oppgaver -->
+<section id="oppgaver">
+    <div class="section-label">04 · Workshop</div>
+    <h2 class="section-title">Tre spor — én pipeline</h2>
+    <p class="section-subtitle">~55 min · Repo delt av fasilitator · <code style="background: rgba(255,255,255,0.06); padding: 0.1rem 0.4rem; border-radius: 4px; font-family: var(--mono); font-size: 0.85em;">claude --dangerously-skip-permissions</code></p>
+
+    <div class="track-card">
+        <div class="track-num">Track 1 — Grunnleggende</div>
+        <h3>🟢 AI legger til regelen for deg</h3>
+        <p class="track-tagline">Følg med gjennom alle faser. Kopier prompten direkte. Se fabrikken i aksjon.</p>
+        <span class="track-time">~45 min</span>
+        <ul class="track-features" style="margin-top: 1rem;">
+            <li>Kopier den ferdige prompten direkte fra <code>doc/workshop-tasks.md</code></li>
+            <li>Følg med gjennom alle faser: Plan → Impl → QC → Holdout → Commit</li>
+            <li>Oppgave: legg til <code>currency_restriction</code>-regelen</li>
+            <li>Alternativ: duplicate transaction check</li>
+        </ul>
+        <div class="code-snippet">
+<span class="cm"><!-- Kopier og lim inn i Claude Code --></span>
+<span class="kw">Legg til</span> <span class="str">currency_restriction</span>-regelen til compliance-servicen.
+Regelen: <span class="str">Flagged</span> ved transaksjoner i BTC, ETH eller XMR.
+Beløpsgrense: <span class="str">long</span> (øre) · følg DSF-protokollen.
+        </div>
+    </div>
+
+    <div class="track-card">
+        <div class="track-num">Track 2 — Avansert</div>
+        <h3>🟡 Du spesifiserer — AI leverer</h3>
+        <p class="track-tagline">Skriv din egen regelspesifikasjon. Se hva som skjer med vag vs. presis spec.</p>
+        <span class="track-time">~55 min</span>
+        <ul class="track-features" style="margin-top: 1rem;">
+            <li>Skriv din egen regelspesifikasjon — fri tekst</li>
+            <li>Eksperimenter: vag spec vs. presis spec — hva er forskjellen i output?</li>
+            <li>Forslag: <code>geo_risk_flag</code> eller <code>round_amount_flag</code></li>
+            <li>Bonus: CI-feil og self-healing (se neste lysbilde)</li>
+        </ul>
+        <div class="warn-box" style="margin-top: 1rem;">💡 Vag spec → agent tolker → kan gå galt. Presis spec → bedre output. <strong>Erfaring med hva som kan gå galt kreves for å skrive god CLAUDE.md.</strong></div>
+    </div>
+
+    <div class="track-card">
+        <div class="track-num">Track 3 — Factory</div>
+        <h3>🟣 Skriv fasiten først</h3>
+        <p class="track-tagline">Det ekte DSF-prinsippet: holdout-scenario committed FØR koden starter.</p>
+        <span class="track-time">~55 min</span>
+        <ul class="track-features" style="margin-top: 1rem;">
+            <li>Skriv holdout-scenario manuelt (se <code>doc/workshop-tasks.md</code>)</li>
+            <li>Commit scenario FØR implementasjon — dette er ordenen, og den er obligatorisk</li>
+            <li>Kjør eval-agent mot kjørende API</li>
+            <li>Bonus: endre en skill, kjør ny regel, se om fabrikken lærer</li>
+        </ul>
+        <div class="code-snippet">
+<span class="cm"># Et holdout-scenario ser slik ut:</span>
+<span class="kw">## Scenario:</span> <span class="str">Valuta-restriksjon utløst</span>
+
+<span class="prop">**Request:**</span> POST /api/v1/screen
+{ "amount": 50000, "currency": <span class="str">"BTC"</span>, ... }
+
+<span class="prop">**Expected status:**</span> <span class="str">Flagged</span>
+<span class="prop">**Active rule:**</span> currency_restriction
+<span class="prop">**Rationale:**</span> BTC er listet som restriktert valuta
+        </div>
+    </div>
+
+    <!-- CI section -->
+    <div style="background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.15); border-radius: var(--radius); padding: 2rem; margin-top: 1rem;">
+        <h3 style="font-size: 1.05rem; margin-bottom: 0.5rem;">🔴 CI feiler — det er forventet</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">CI-feil er input til dev-agenten, ikke en stoppesituasjon. Slik håndterer du det:</p>
+        <div class="code-snippet">
+<span class="cm"># Sjekk CI-status</span>
+gh run list --limit 5
+
+<span class="cm"># Hent feildetaljer</span>
+gh run view --log-failed
+
+<span class="cm"># Send til dev-agenten:</span>
+<span class="str">"CI feiler på branch main. Output: [lim inn output]. Analyser og fiks."</span>
+
+<span class="cm"># Etter fiks:</span>
+git push
+gh run watch
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"><span class="divider-inner">⚙️ 🏭 ⚙️</span></div>
+
+<!-- Repos -->
+<section id="repos">
+    <div class="section-label">🔗 Repo</div>
+    <h2 class="section-title">Alt du trenger er inni</h2>
+    <p class="section-subtitle">To versjoner tilgjengelig. Alle spor og prompts i <code>doc/workshop-tasks.md</code>.</p>
+
+    <div class="repo-grid">
+        <div class="repo-card">
+            <div class="repo-title">🐳 Public · Docker</div>
+            <div class="repo-desc">Krever Docker — ingen lokal .NET SDK nødvendig. Enkleste oppsett for workshopen.</div>
+            <span class="repo-tag">Docker</span>
+            <a class="repo-link" href="https://github.com/larssoraas/compliance-dsf-run-en/" target="_blank">
+                github.com/larssoraas/compliance-dsf-run-en ↗
+            </a>
+        </div>
+        <div class="repo-card">
+            <div class="repo-title">⚙️ Private · .NET 10</div>
+            <div class="repo-desc">Krever .NET 10 SDK — ingen Docker nødvendig. For de som vil gå dypere i koden.</div>
+            <span class="repo-tag">.NET 10</span>
+            <a class="repo-link" href="https://github.com/larssoraas/compliance-dsf-en-net-native-run/" target="_blank">
+                github.com/larssoraas/compliance-dsf-en-net-native-run ↗
+            </a>
+        </div>
+    </div>
+
+    <div style="margin-top: 2rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem 2rem;">
+        <h4 style="font-size: 0.95rem; margin-bottom: 1rem;">Live agent monitor — se fabrikken kjøre i sanntid</h4>
+        <div class="code-snippet">
+<span class="cm"># Terminal (alle OS):</span>
+<span class="kw">while</span> true; <span class="kw">do</span>
+  clear
+  bash .claude/hooks/agent-watch.sh
+  sleep 1
+<span class="kw">done</span>
+
+<span class="cm"># GUI — flytende vindu, alltid på topp:</span>
+python3 .claude/hooks/agent-watch-gui.py
+        </div>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.8rem;">Prereqs: macOS (Python 3 inkludert) · Windows (python.org install — husk "Add to PATH") · Linux (sudo apt install python3-tk)</p>
+    </div>
+
+    <div style="margin-top: 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem 2rem;">
+        <h4 style="font-size: 0.95rem; margin-bottom: 0.8rem;">Hva er i repoet</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.8rem;">
+            <div>
+                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">src/</span>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Full compliance-service</p>
+            </div>
+            <div>
+                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">tests/</span>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">47 passerende tester</p>
+            </div>
+            <div>
+                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">scenarios/</span>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">6 holdout-scenarioer (fasiten)</p>
+            </div>
+            <div>
+                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">doc/workshop-tasks.md</span>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Alle spor + copy-paste-prompts</p>
+            </div>
+            <div>
+                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">.claude/skills/</span>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Agentrollebeskrivelser</p>
+            </div>
+            <div>
+                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">CLAUDE.md</span>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Fabrikkontrakten — start her</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"><span class="divider-inner">⚙️ 🏭 ⚙️</span></div>
+
+<!-- Diskusjon -->
+<section id="diskusjon">
+    <div class="section-label">05 · Diskusjon</div>
+    <h2 class="section-title">Hva skjer med oss?</h2>
+    <p class="section-subtitle">Fabrikken koder. Men hvem forstår hva koden gjør? Og hvem eier feilen når den når produksjon?</p>
+
+    <div class="discussion-grid">
+        <div class="disc-card">
+            <div class="disc-num">01</div>
+            <h4>Utviklerrollen</h4>
+            <p>Fra å skrive kode til å skrive CLAUDE.md. Fra implementasjon til intent. Er det en ny type seniorrolle — domenekspert med nok teknisk forståelse til å evaluere fabrikken?</p>
+        </div>
+        <div class="disc-card">
+            <div class="disc-num">02</div>
+            <h4>Junior-opplæring</h4>
+            <p>Tradisjonelt: skriv kode → få review → forstå feil → bygg intuisjon. Når agenten skriver koden — hva skjer med læringsarenaen? Kan man lære debugging uten å ha skrevet mye kode?</p>
+        </div>
+        <div class="disc-card">
+            <div class="disc-num">03</div>
+            <h4>Accountability</h4>
+            <p>Koden er agentgenerert. Reviewen er agentgenerert. Hvem eier feilen når den når produksjon? DORA og Solvency II krever at finansinstitusjoner kan forklare og auditere all produksjonskode.</p>
+        </div>
+        <div class="disc-card">
+            <div class="disc-num">04</div>
+            <h4>Teknisk gjeld og forståelse</h4>
+            <p>Agenten genererer kode raskt. Men kjenner noen på teamet til hva som faktisk er i produksjon? Kan vi refaktorere uten å forstå det vi refaktorerer?</p>
+        </div>
+        <div class="disc-card">
+            <div class="disc-num">05</div>
+            <h4>Kontroll vs. hastighet</h4>
+            <p>Fabrikken kan produsere 1 000 linjer på 20 minutter. Gir det for lite tid til å forstå hva som leveres? Speed hides errors. More output ≠ more correct output.</p>
+        </div>
+        <div class="disc-card">
+            <div class="disc-num">06</div>
+            <h4>Sikkerhet og avhengigheter</h4>
+            <p>Agenten introduserer NuGet-pakker og setter opp Docker. Hvem gjør dependency review? Hvem oppdager sikkerhetssårbarheter i agentgenererte tredjepartspakker?</p>
+        </div>
+    </div>
+
+    <div style="margin-top: 2rem; background: rgba(168,85,247,0.04); border: 1px solid rgba(168,85,247,0.15); border-radius: var(--radius); padding: 2rem;">
+        <h3 style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--purple-light);">Diskusjonsspørsmål</h3>
+        <ol style="list-style: decimal; padding-left: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem;">
+            <li style="font-size: 0.9rem; color: var(--text-muted);">Hva overrasket deg mest under workshopen — positivt eller negativt?</li>
+            <li style="font-size: 0.9rem; color: var(--text-muted);">Hvilke oppgaver i teamet ligner mest på det fabrikken løser?</li>
+            <li style="font-size: 0.9rem; color: var(--text-muted);">DORA / Solvency II — er agentgenerert kode forsvarlig i en regulert virksomhet?</li>
+        </ol>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 1rem;">Om tid: Hva måtte du spesifisere mer presist enn forventet? · Kan juniorer lære å kode godt uten å skrive kode? · Hva er den viktigste ferdigheten en senior trenger i DSF? · Hvor vil du sette inn human review i en reell pipeline?</p>
+    </div>
+
+    <!-- Role shift -->
+    <div style="margin-top: 2rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem;">
+        <h3 style="font-size: 1.05rem; margin-bottom: 1rem;">Rolleskiftet</h3>
+        <table class="compare-table">
+            <thead><tr><th>Aspekt</th><th>Klassisk utviklerrolle</th><th>DSF-rolle</th></tr></thead>
+            <tbody>
+                <tr><td>Primæroppgave</td><td>Skriv kode</td><td>Skriv CLAUDE.md (intent-laget)</td></tr>
+                <tr><td>Tester</td><td>Skriv unit-tester</td><td>Skriv holdout-scenarioer (fasiten)</td></tr>
+                <tr><td>Review</td><td>Code review</td><td>Evaluer agentens output</td></tr>
+                <tr><td>Kvalitet</td><td>Debug feil</td><td>Oppdater skills fra analyse</td></tr>
+                <tr><td>Infrastruktur</td><td>CI-konfigurasjon</td><td>Definer kvalitetsporter (hooks)</td></tr>
+                <tr><td>Krav</td><td>Domenekunnskap</td><td>Domenekunnskap (ikke valgfritt)</td></tr>
+            </tbody>
+        </table>
+        <div class="info-box" style="margin-top: 1rem;">💡 Syklustid → ned. Eksperimentering → opp. En sprint koster ikke lenger 2 uker og 3 utviklere — det koster 20 minutter og én setning. Risikoen: hastigheten skjuler feilene.</div>
+    </div>
+</section>
+
+<div class="section-divider"><span class="divider-inner">⚙️ 🏭 ⚙️</span></div>
+
+<!-- Tips -->
+<section id="tips">
+    <div class="section-label">💡 Tips</div>
+    <h2 class="section-title">Fra fabrikkmesteren</h2>
+    <p class="section-subtitle">Praktisk visdom fra dem som har kjørt fabrikken — og sett hva som går galt.</p>
+
+    <div class="tip-card">
+        <div class="tip-icon">📄</div>
+        <div>
+            <h4>CLAUDE.md er høyest-verdiskapende arbeid</h4>
+            <p>Tid brukt på å forbedre CLAUDE.md er bedre investert enn tid brukt på å fikse agent-output. Presis tekst → bedre fabrikk.</p>
+        </div>
+    </div>
+    <div class="tip-card">
+        <div class="tip-icon">🔐</div>
+        <div>
+            <h4>Commit holdout-scenariet FØR du starter agenten</h4>
+            <p>Rekkefølgen er obligatorisk. Scenario committed → dev-agent starter. Ikke omvendt. Ellers er det ikke holdout — det er bare en navngitt test.</p>
+        </div>
+    </div>
+    <div class="tip-card">
+        <div class="tip-icon">⚡</div>
+        <div>
+            <h4>Start enkelt, evaluer, iterer</h4>
+            <p>En presis spec for én regel > en vag spec for fem regler. Fabrikken skalerer når du stoler på protokollen — ikke før.</p>
+        </div>
+    </div>
+    <div class="tip-card">
+        <div class="tip-icon">🔍</div>
+        <div>
+            <h4>Hooks er ikke byråkrati — de er fabrikken</h4>
+            <p>Fristelsen er å bypass hooks når de blokkerer. Det er feil. Hookens blokkering er informasjon: protokollen er brutt, og det er det som skal fikses.</p>
+        </div>
+    </div>
+    <div class="tip-card">
+        <div class="tip-icon">📊</div>
+        <div>
+            <h4>Les analyse-rapporten etter hvert kjør</h4>
+            <p>doc/*-analyse.md skrives automatisk. Den inneholder: timing, review-funn, test-analyse, og prosessforbedringer. Det er herfra skills-oppdateringer kommer.</p>
+        </div>
+    </div>
+    <div class="tip-card">
+        <div class="tip-icon">🤔</div>
+        <div>
+            <h4>Det viktigste spørsmålet er ikke «kan AI skrive kode?»</h4>
+            <p>Det kan. Spørsmålet er hva som er igjen for oss — og hva vi vil gjøre med det.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <p style="font-size: 1.8rem; margin-bottom: 1rem;">⚙️ 🏭 🤖 📐 ⚙️</p>
+    <p style="margin-bottom: 0.5rem; font-size: 0.95rem; color: var(--amber);">Dark Software Factory — Workshop</p>
+    <p style="margin-bottom: 0.5rem;">Fabrikken er mørk. Ingen trenger å være til stede.</p>
+    <p style="font-size: 0.72rem; margin-top: 1rem; color: var(--text-muted);">
+        Ressurser: README.md · doc/dsf-runbook.md · doc/workshop-tasks.md · doc/human-vs-ai-responsibility.md · doc/*-analyse.md
+    </p>
+</footer>
+
+<!-- Slide navigation -->
+<div class="slide-nav" id="slideNav">
+    <button class="slide-btn" id="slidePrev" title="Forrige (←)">&#8592;</button>
+    <div class="slide-info">
+        <div class="slide-counter"><span id="slideNum">1</span> / <span id="slideTotal">8</span></div>
+        <div class="slide-name" id="slideName">Intro</div>
+    </div>
+    <div class="slide-dots" id="slideDots"></div>
+    <button class="slide-btn" id="slideNext" title="Neste (→)">&#8594;</button>
+</div>
+
+<!-- Worker counter -->
+<div class="worker-counter" id="workerCounter">🔧 <span id="workerCount">0</span>/6 arbeidere funnet</div>
+
+<!-- Scroll progress -->
+<div class="progress-bar" id="progress"></div>
+
+<script>
+    // ── Scroll progress ──
+    window.addEventListener('scroll', () => {
+        const h = document.documentElement;
+        document.getElementById('progress').style.width =
+            (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100 + '%';
+        document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    document.querySelectorAll('.nav-links a').forEach(a => {
+        a.addEventListener('click', () => document.querySelector('.nav-links').classList.remove('open'));
+    });
+
+    // ── Intersection Observer ──
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.08 });
+
+    document.querySelectorAll('.principle-card, .track-card, .tip-card, .card, .demo-stat, .disc-card, .repo-card, .timeline-item').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        observer.observe(el);
+    });
+
+    // ── Floating particles ──
+    const particleEmojis = ['⚙️','🔧','🤖','📐','🏭','💾','📦','🔩','🛠️','⛓️'];
+    const container = document.getElementById('bgParticles');
+    for (let i = 0; i < 20; i++) {
+        const p = document.createElement('div');
+        p.className = 'bg-particle';
+        p.textContent = particleEmojis[Math.floor(Math.random() * particleEmojis.length)];
+        p.style.left = Math.random() * 100 + '%';
+        p.style.fontSize = (0.9 + Math.random() * 1.4) + 'rem';
+        p.style.animationDuration = (20 + Math.random() * 30) + 's';
+        p.style.animationDelay = (Math.random() * 20) + 's';
+        container.appendChild(p);
+    }
+
+    // ── Pipeline Visualizer ──
+    const pipelineLog = [
+        { step: 0, status: 'active', statusText: 'kjører...', log: '[Orchestrator] Dispatcher Architect agent...' },
+        { step: 0, status: 'done',   statusText: 'done', log: '[Architect] Plan med 4 faser generert · doc/compliance-plan.md committed' },
+        { step: 1, status: 'active', statusText: 'kjører...', log: '[Developer] Fase 1: domenelag — typer, interfaces...' },
+        { step: 1, status: 'done',   statusText: 'done', log: '[Developer] Fase 1 implementert · QC-status: IMPLEMENTED' },
+        { step: 2, status: 'active', statusText: 'kjører...', log: '[Reviewer + Tester] To Task-kall i SAMME melding — parallelt QC...' },
+        { step: 2, status: 'done',   statusText: 'approved', log: '[Review] 3 funn · [Test] Coverage OK · QC-status: APPROVED' },
+        { step: 3, status: 'active', statusText: 'kjører...', log: '[Eval] Kjører mot API · 5 holdout-scenarioer...' },
+        { step: 3, status: 'done',   statusText: '5/5 ✓', log: '[Eval] 01 ✅ 02 ✅ 03 ✅ 04 ✅ 05 ✅ — Score: 5/5 = 100%' },
+        { step: 4, status: 'active', statusText: 'committing...', log: '[Hook] require-analyse.sh · Blokkerer uten doc/*-analyse.md...' },
+        { step: 4, status: 'done',   statusText: 'done', log: '[Developer] Analyse generert · git commit OK · 47/47 tester grønne' },
+        { step: 5, status: 'active', statusText: 'skriver...', log: '[Orchestrator] doc/*-analyse.md — timing, funn, prosessforbedringer...' },
+        { step: 5, status: 'done',   statusText: 'done', log: '[Factory] Syklus komplett · Skills oppdatert · Neste feature starter forbedret 🏭' },
+    ];
+
+    let pipelineRunning = false;
+    const runBtn = document.getElementById('runPipelineBtn');
+    const logEl = document.getElementById('factoryLog');
+
+    function resetPipeline() {
+        document.querySelectorAll('.pipeline-step').forEach(s => {
+            s.className = 'pipeline-step';
+            s.querySelector('.ps-status').textContent = 'venter';
+        });
+    }
+
+    function appendLog(msg, color) {
+        const line = document.createElement('div');
+        line.style.color = color || '#666';
+        line.textContent = msg;
+        logEl.appendChild(line);
+        logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    async function runPipeline() {
+        if (pipelineRunning) return;
+        pipelineRunning = true;
+        runBtn.disabled = true;
+        logEl.innerHTML = '';
+        resetPipeline();
+
+        const steps = document.querySelectorAll('.pipeline-step');
+        const colors = { active: '#f59e0b', done: '#10b981', approved: '#10b981', blocked: '#ef4444' };
+
+        for (const entry of pipelineLog) {
+            await new Promise(r => setTimeout(r, 600 + Math.random() * 400));
+            const step = steps[entry.step];
+            step.className = 'pipeline-step ' + entry.status;
+            step.querySelector('.ps-status').textContent = entry.statusText;
+            const logColor = entry.status === 'done' ? '#10b981' : entry.status === 'active' ? '#f59e0b' : '#ef4444';
+            appendLog(entry.log, logColor);
+        }
+
+        pipelineRunning = false;
+        runBtn.disabled = false;
+        runBtn.textContent = '🔄 Kjør igjen';
+
+        // Confetti burst!
+        for (let i = 0; i < 12; i++) {
+            setTimeout(() => {
+                const c = document.createElement('div');
+                c.className = 'confetti-piece';
+                c.textContent = ['⚙️','✅','🏭','🤖','📦','⭐'][Math.floor(Math.random() * 6)];
+                c.style.left = (20 + Math.random() * 60) + '%';
+                c.style.top = '0px';
+                c.style.animationDuration = (2 + Math.random() * 2) + 's';
+                document.body.appendChild(c);
+                setTimeout(() => c.remove(), 5000);
+            }, i * 150);
+        }
+    }
+
+    runBtn.addEventListener('click', runPipeline);
+
+    // ── Slide Navigation ──
+    const SLIDES = [
+        { id: 'hero',      name: 'Intro' },
+        { id: 'bakgrunn',  name: '01 · Bakgrunn' },
+        { id: 'prinsipper',name: '02 · Prinsipper' },
+        { id: 'demo',      name: '03 · Demo' },
+        { id: 'oppgaver',  name: '04 · Oppgaver' },
+        { id: 'repos',     name: 'Repos' },
+        { id: 'diskusjon', name: '05 · Diskusjon' },
+        { id: 'tips',      name: 'Tips' },
+    ];
+
+    let currentSlide = 0;
+    const slideNumEl  = document.getElementById('slideNum');
+    const slideTotalEl = document.getElementById('slideTotal');
+    const slideNameEl = document.getElementById('slideName');
+    const slidePrevBtn = document.getElementById('slidePrev');
+    const slideNextBtn = document.getElementById('slideNext');
+    const slideDotsEl  = document.getElementById('slideDots');
+
+    slideTotalEl.textContent = SLIDES.length;
+
+    // Build dots
+    SLIDES.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'slide-dot' + (i === 0 ? ' active' : '');
+        dot.addEventListener('click', () => goToSlide(i));
+        slideDotsEl.appendChild(dot);
+    });
+
+    function updateSlideUI() {
+        slideNumEl.textContent = currentSlide + 1;
+        slideNameEl.textContent = SLIDES[currentSlide].name;
+        slidePrevBtn.disabled = currentSlide === 0;
+        slideNextBtn.disabled = currentSlide === SLIDES.length - 1;
+        slideDotsEl.querySelectorAll('.slide-dot').forEach((d, i) => {
+            d.classList.toggle('active', i === currentSlide);
+        });
+    }
+
+    function goToSlide(index) {
+        currentSlide = Math.max(0, Math.min(SLIDES.length - 1, index));
+        const target = document.getElementById(SLIDES[currentSlide].id);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        updateSlideUI();
+    }
+
+    slidePrevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+    slideNextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
+
+    // Keyboard: ← → navigate slides, ↑ ↓ scroll normally (don't hijack)
+    document.addEventListener('keydown', (e) => {
+        // Don't trigger when typing in an input or the pipeline game is focused
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.code === 'ArrowRight' || e.code === 'ArrowLeft') {
+            e.preventDefault();
+            goToSlide(currentSlide + (e.code === 'ArrowRight' ? 1 : -1));
+        }
+    });
+
+    // Update current slide indicator on scroll
+    const sectionEls = SLIDES.map(s => document.getElementById(s.id)).filter(Boolean);
+    const scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const idx = sectionEls.indexOf(entry.target);
+                if (idx !== -1 && idx !== currentSlide) {
+                    currentSlide = idx;
+                    updateSlideUI();
+                }
+            }
+        });
+    }, { threshold: 0.4 });
+    sectionEls.forEach(el => scrollObserver.observe(el));
+
+    updateSlideUI();
+
+    // ── Hidden factory workers ──
+    let workersFound = 0;
+    const totalWorkers = 6;
+    const workerPositions = [
+        { section: '#bakgrunn', top: '20%', right: '4%', emoji: '🔧' },
+        { section: '#prinsipper', top: '35%', left: '2%', emoji: '🤖' },
+        { section: '#prinsipper', top: '65%', right: '3%', emoji: '⚙️' },
+        { section: '#demo', top: '40%', left: '2%', emoji: '🛠️' },
+        { section: '#oppgaver', top: '25%', right: '4%', emoji: '🔩' },
+        { section: '#diskusjon', top: '55%', left: '3%', emoji: '🏭' },
+    ];
+
+    workerPositions.forEach(pos => {
+        const section = document.querySelector(pos.section);
+        if (!section) return;
+        section.style.position = 'relative';
+        const w = document.createElement('div');
+        w.className = 'hidden-worker';
+        w.textContent = pos.emoji;
+        w.style.top = pos.top;
+        if (pos.left) w.style.left = pos.left;
+        if (pos.right) w.style.right = pos.right;
+        w.addEventListener('click', () => {
+            if (w.classList.contains('found')) return;
+            w.classList.add('found');
+            workersFound++;
+            document.getElementById('workerCount').textContent = workersFound;
+
+            // Mini-confetti
+            const rect = w.getBoundingClientRect();
+            const emojis = ['⚙️','🔧','🤖','✅','📦','⭐'];
+            for (let j = 0; j < 6; j++) {
+                const c = document.createElement('div');
+                c.className = 'confetti-piece';
+                c.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                c.style.left = (rect.left + Math.random() * 60 - 20) + 'px';
+                c.style.top = (rect.top - 10) + 'px';
+                c.style.animationDuration = (0.8 + Math.random() * 0.8) + 's';
+                document.body.appendChild(c);
+                setTimeout(() => c.remove(), 2000);
+            }
+
+            if (workersFound >= totalWorkers) {
+                const counter = document.getElementById('workerCounter');
+                counter.classList.add('complete');
+                counter.innerHTML = '🏭 Fabrikken er bemannet! 🎉';
+                // Big burst
+                setTimeout(() => {
+                    for (let k = 0; k < 20; k++) {
+                        setTimeout(() => {
+                            const c = document.createElement('div');
+                            c.className = 'confetti-piece';
+                            c.textContent = ['⚙️','🏭','🤖','✅','⭐','🔧'][Math.floor(Math.random() * 6)];
+                            c.style.left = Math.random() * window.innerWidth + 'px';
+                            c.style.top = '0px';
+                            c.style.fontSize = (1.5 + Math.random() * 1.5) + 'rem';
+                            c.style.animationDuration = (2 + Math.random() * 3) + 's';
+                            document.body.appendChild(c);
+                            setTimeout(() => c.remove(), 6000);
+                        }, k * 100);
+                    }
+                }, 200);
+            }
+        });
+        section.appendChild(w);
+    });
+</script>
+</body>
+</html>

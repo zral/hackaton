@@ -243,35 +243,72 @@
         /* ── Maturity ladder ── */
         .ladder-container { margin-top: 2rem; overflow-x: auto; }
         .ladder {
-            display: flex; gap: 0; min-width: 600px;
+            display: flex; gap: 0; min-width: 700px;
             background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius); overflow: hidden;
+            border-radius: var(--radius) var(--radius) 0 0; overflow: hidden;
         }
         .ladder-step {
-            flex: 1; padding: 1.2rem 1rem; text-align: center;
+            flex: 1; padding: 1.4rem 0.9rem 1.2rem; text-align: center;
             border-right: 1px solid var(--border); transition: all 0.3s;
-            position: relative;
+            position: relative; display: flex; flex-direction: column; align-items: center;
         }
         .ladder-step:last-child { border-right: none; }
         .ladder-step.current {
             background: rgba(245,158,11,0.08);
             border-color: rgba(245,158,11,0.2);
         }
-        .ladder-step.future { opacity: 0.4; }
+        .ladder-step.future { opacity: 0.35; }
+        .ladder-step:not(.current):not(.future):hover { background: rgba(255,255,255,0.02); }
         .step-num {
-            font-family: var(--mono); font-size: 0.7rem; color: var(--text-muted);
+            font-family: var(--mono); font-size: 0.62rem; color: var(--text-muted);
             letter-spacing: 1px; margin-bottom: 0.4rem; display: block;
         }
-        .step-name { font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem; }
-        .step-human { font-size: 0.7rem; color: var(--text-muted); }
+        .step-name { font-size: 0.82rem; font-weight: 700; margin-bottom: 0.35rem; }
+        .step-desc {
+            font-size: 0.67rem; color: rgba(136,138,170,0.75); line-height: 1.45;
+            margin-bottom: 0.5rem; flex: 1;
+        }
+        .step-human {
+            font-size: 0.68rem; color: var(--text-muted);
+            font-family: var(--mono); margin-top: auto;
+            background: rgba(255,255,255,0.04); padding: 0.15rem 0.5rem;
+            border-radius: 100px; border: 1px solid rgba(255,255,255,0.06);
+        }
         .ladder-step.current .step-name { color: var(--amber); }
-        .ladder-step.current .step-human { color: var(--amber-light); font-weight: 600; }
+        .ladder-step.current .step-desc { color: rgba(245,158,11,0.65); }
+        .ladder-step.current .step-human {
+            color: var(--amber-light); font-weight: 700;
+            background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.2);
+        }
         .current-badge {
             position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
-            background: var(--amber); color: #000; font-size: 0.58rem; font-weight: 800;
+            background: var(--amber); color: #000; font-size: 0.56rem; font-weight: 800;
             padding: 0.15rem 0.5rem; border-radius: 0 0 6px 6px; letter-spacing: 0.5px;
             white-space: nowrap;
         }
+        .ladder-progress {
+            min-width: 700px; height: 5px; border-radius: 0 0 var(--radius) var(--radius);
+            background: linear-gradient(90deg,
+                var(--green) 0%,
+                var(--cyan) 35%,
+                var(--amber) 71%,
+                var(--amber-light) 86%,
+                rgba(168,85,247,0.4) 100%
+            );
+            border: 1px solid var(--border); border-top: none;
+        }
+        .ladder-legend {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 0.6rem; padding: 0 0.2rem;
+            font-size: 0.68rem; color: var(--text-muted); font-family: var(--mono);
+            min-width: 700px;
+        }
+        .ladder-note {
+            background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.12);
+            border-radius: 10px; padding: 0.9rem 1.1rem; margin-top: 1.2rem;
+            font-size: 0.8rem; color: var(--text-muted); line-height: 1.6;
+        }
+        .ladder-note strong { color: var(--amber); }
 
         /* ── Principle cards ── */
         .principle-card {
@@ -332,19 +369,18 @@
 
         .pipeline-steps {
             display: flex; align-items: stretch; gap: 0;
-            flex-wrap: nowrap; overflow-x: auto;
         }
         .pipeline-step {
-            flex: 1; min-width: 120px;
+            flex: 1;
             background: rgba(255,255,255,0.02); border: 1px solid var(--border);
-            border-radius: 8px; padding: 1rem 0.8rem; text-align: center;
-            position: relative; margin-right: 2rem; transition: all 0.5s;
+            border-radius: 8px; padding: 0.9rem 0.5rem; text-align: center;
+            position: relative; margin-right: 1.4rem; transition: all 0.5s;
         }
         .pipeline-step:last-child { margin-right: 0; }
         .pipeline-step::after {
             content: '→';
-            position: absolute; right: -1.6rem; top: 50%; transform: translateY(-50%);
-            color: var(--text-muted); font-size: 1rem; font-weight: 700;
+            position: absolute; right: -1.1rem; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); font-size: 0.9rem; font-weight: 700;
         }
         .pipeline-step:last-child::after { display: none; }
         .pipeline-step.active {
@@ -380,8 +416,7 @@
         .factory-log {
             margin-top: 1rem; background: rgba(0,0,0,0.4); border: 1px solid var(--border);
             border-radius: 8px; padding: 1rem; font-family: var(--mono);
-            font-size: 0.75rem; min-height: 4rem; line-height: 1.8;
-            max-height: 120px; overflow-y: auto;
+            font-size: 0.75rem; min-height: 2rem; line-height: 1.8;
         }
 
         /* ── Demo results ── */
@@ -525,11 +560,41 @@
             display: block; font-weight: 700; color: var(--amber);
             margin-bottom: 1rem; font-size: 0.85rem;
         }
-        .md-h2 { color: var(--cyan-light); font-weight: 700; }
-        .md-table-head { color: var(--amber); }
-        .md-rule { color: var(--green-light); }
+        .md-h2 { color: var(--cyan-light); font-weight: 700; display: block; margin: 1rem 0 0.5rem; }
+        .md-h2:first-child { margin-top: 0; }
         .md-value { color: var(--text-muted); }
         .md-comment { color: #444; font-style: italic; }
+
+        .md-table { width: 100%; border-collapse: collapse; margin: 0.4rem 0 0.8rem; }
+        .md-table th {
+            text-align: left; color: var(--amber); font-weight: 700;
+            padding: 0.3rem 0.8rem; border-bottom: 1px solid rgba(245,158,11,0.25);
+            font-size: 0.75rem;
+        }
+        .md-table td {
+            padding: 0.3rem 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: var(--text-muted); font-size: 0.75rem; vertical-align: middle;
+        }
+        .md-table td:first-child { color: var(--green-light); }
+        .md-table tr:last-child td { border-bottom: none; }
+        .md-table tr:hover td { background: rgba(255,255,255,0.02); }
+        .status-badge {
+            display: inline-block; padding: 0.1rem 0.5rem; border-radius: 100px;
+            font-size: 0.68rem; font-weight: 700; letter-spacing: 0.3px;
+        }
+        .s-flag    { background: rgba(245,158,11,0.15); color: var(--amber-light); }
+        .s-reject  { background: rgba(239,68,68,0.12);  color: var(--red-light); }
+        .s-pending { background: rgba(168,85,247,0.12); color: var(--purple-light); }
+
+        .md-list { list-style: none; margin: 0.2rem 0 0.6rem; padding: 0; }
+        .md-list li {
+            color: var(--text-muted); font-size: 0.75rem; padding: 0.2rem 0;
+            display: flex; align-items: baseline; gap: 0.5rem;
+        }
+        .md-list li::before { content: '–'; color: var(--border); flex-shrink: 0; }
+        .md-list code { color: var(--cyan-light); background: rgba(6,182,212,0.08); padding: 0.05rem 0.3rem; border-radius: 3px; }
+        .md-kw-never  { color: var(--red-light);   font-weight: 700; }
+        .md-kw-always { color: var(--green-light);  font-weight: 700; }
 
         /* ── Tips ── */
         .tip-card {
@@ -726,8 +791,8 @@
             <li><a href="#bakgrunn">Bakgrunn</a></li>
             <li><a href="#prinsipper">Prinsipper</a></li>
             <li><a href="#demo">Demo</a></li>
-            <li><a href="#oppgaver">Oppgaver</a></li>
             <li><a href="#repos">Repos</a></li>
+            <li><a href="#oppgaver">Oppgaver</a></li>
             <li><a href="#diskusjon">Diskusjon</a></li>
         </ul>
     </div>
@@ -844,42 +909,56 @@
                 <div class="ladder-step">
                     <span class="step-num">STEG 1</span>
                     <div class="step-name">Manuell</div>
+                    <div class="step-desc">Ingen AI-hjelp</div>
                     <div class="step-human">100% menneske</div>
                 </div>
                 <div class="ladder-step">
                     <span class="step-num">STEG 2</span>
                     <div class="step-name">Autofullføring</div>
+                    <div class="step-desc">GitHub Copilot-stil forslag</div>
                     <div class="step-human">~80% menneske</div>
                 </div>
                 <div class="ladder-step">
                     <span class="step-num">STEG 3</span>
                     <div class="step-name">Chat-drevet</div>
+                    <div class="step-desc">ChatGPT / Claude<br>Kopier–lim fra chat</div>
                     <div class="step-human">~60% menneske</div>
                 </div>
                 <div class="ladder-step">
                     <span class="step-num">STEG 4</span>
                     <div class="step-name">Agent i IDE</div>
+                    <div class="step-desc">Claude Code / Cursor<br>AI skriver filer, menneske godkjenner</div>
                     <div class="step-human">~40% menneske</div>
                 </div>
                 <div class="ladder-step">
                     <span class="step-num">STEG 5</span>
                     <div class="step-name">Orkestrert agent</div>
+                    <div class="step-desc">Én agent, protokoll<br>Menneske reviewer, ingen pipeline-håndhevelse</div>
                     <div class="step-human">~20% menneske</div>
                 </div>
                 <div class="ladder-step current">
                     <span class="current-badge">📍 DENNE WORKSHOPEN</span>
                     <span class="step-num">STEG 6</span>
                     <div class="step-name">DSF</div>
+                    <div class="step-desc">Én løs setning fra mennesket<br>AI skriver plan, scenarioer, kode, review og analyse — alt</div>
                     <div class="step-human">~1 setning</div>
                 </div>
                 <div class="ladder-step future">
                     <span class="step-num">STEG 7</span>
                     <div class="step-name">Full autonomi</div>
+                    <div class="step-desc">AI bestemmer også hva som bygges og prioriterer selv</div>
                     <div class="step-human">Ikke her — ennå</div>
                 </div>
             </div>
+            <div class="ladder-progress"></div>
+            <div class="ladder-legend">
+                <span>← mer menneskelig kontroll</span>
+                <span>mer AI-autonomi →</span>
+            </div>
         </div>
-        <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.8rem;">Steg 6 vs 7: I DSF leverer mennesket én løs setning — AI skriver alt annet, inkl. plan, scenarioer, kode, review og analyse. Det som skiller steg 6 fra 7: mennesket bestemmer fortsatt hva som bygges.</p>
+        <div class="ladder-note">
+            <strong>Steg 6 vs. 7:</strong> I DSF leverer mennesket én løs setning — AI skriver alt annet, inkludert plan, scenarioer, kode, review og analyse. Det som skiller steg 6 fra 7: mennesket bestemmer fortsatt <em>hva</em> som bygges. I steg 7 er det sjekkpunktet borte.
+        </div>
     </div>
 </section>
 
@@ -898,22 +977,43 @@
         <p class="tagline">Brifingen til en senior utvikler som starter dag én. Bedre CLAUDE.md → bedre output.</p>
 
         <div class="claude-preview">
-<span class="md-h2">## Compliance-regler</span>
-<span class="md-table-head">| Regel                      | Status          | Kort versjon         |</span>
-<span class="md-table-head">|---------------------------|-----------------|----------------------|</span>
-<span class="md-rule">| `amount_threshold`</span>         <span class="md-value">| Flagged   | > 100 000 NOK  |</span>
-<span class="md-rule">| `sanctioned_country`</span>       <span class="md-value">| Rejected  | KP/IR/SY/CU/RU |</span>
-<span class="md-rule">| `pep_check`</span>                <span class="md-value">| PendingReview  | PEP + > 50k NOK |</span>
+            <span class="md-h2">## Compliance-regler</span>
+            <table class="md-table">
+                <thead>
+                    <tr><th>Regel</th><th>Status</th><th>Kort versjon</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>amount_threshold</code></td>
+                        <td><span class="status-badge s-flag">Flagged</span></td>
+                        <td>&gt; 100 000 NOK</td>
+                    </tr>
+                    <tr>
+                        <td><code>sanctioned_country</code></td>
+                        <td><span class="status-badge s-reject">Rejected</span></td>
+                        <td>KP / IR / SY / CU / RU</td>
+                    </tr>
+                    <tr>
+                        <td><code>pep_check</code></td>
+                        <td><span class="status-badge s-pending">PendingReview</span></td>
+                        <td>PEP + &gt; 50k NOK</td>
+                    </tr>
+                </tbody>
+            </table>
 
-<span class="md-h2">## Etablerte beslutninger (ikke til diskusjon)</span>
-<span class="md-value">- Beløp alltid `long` (øre) — aldri `decimal`</span>
-<span class="md-value">- 200 OK for screening — ikke 201</span>
-<span class="md-value">- `IScreeningRule` er kontrakten</span>
+            <span class="md-h2">## Etablerte beslutninger (ikke til diskusjon)</span>
+            <ul class="md-list">
+                <li>Beløp alltid <code>long</code> (øre) — aldri <code>decimal</code></li>
+                <li>200 OK for screening — ikke 201</li>
+                <li><code>IScreeningRule</code> er kontrakten</li>
+            </ul>
 
-<span class="md-h2">## Ikke-forhandlbare regler</span>
-<span class="md-value">- ALDRI implementer uten plan</span>
-<span class="md-value">- ALDRI la orkestrøren skrive kode</span>
-<span class="md-value">- ALLTID kjør review og test parallelt</span>
+            <span class="md-h2">## Ikke-forhandlbare regler</span>
+            <ul class="md-list">
+                <li><span class="md-kw-never">ALDRI</span> implementer uten plan</li>
+                <li><span class="md-kw-never">ALDRI</span> la orkestrøren skrive kode</li>
+                <li><span class="md-kw-always">ALLTID</span> kjør review og test parallelt</li>
+            </ul>
         </div>
         <div class="info-box">💡 Å forbedre CLAUDE.md er det høyest-verdiskaping et menneske gjør. Det er fabrikkens instruksjonsmanual.</div>
     </div>
@@ -1115,6 +1215,80 @@
 
 <div class="section-divider"><span class="divider-inner">⚙️ 🏭 ⚙️</span></div>
 
+<!-- Repos -->
+<section id="repos">
+    <div class="section-label">🔗 Repo</div>
+    <h2 class="section-title">Alt du trenger er inni</h2>
+    <p class="section-subtitle">To versjoner tilgjengelig. Alle spor og prompts i <code>doc/workshop-tasks.md</code>.</p>
+
+    <div class="repo-grid">
+        <div class="repo-card">
+            <div class="repo-title">🐳 Public · Docker</div>
+            <div class="repo-desc">Krever Docker — ingen lokal .NET SDK nødvendig. Enkleste oppsett for workshopen.</div>
+            <span class="repo-tag">Docker</span>
+            <a class="repo-link" href="https://github.com/larssoraas/compliance-dsf-run-en/" target="_blank">
+                github.com/larssoraas/compliance-dsf-run-en ↗
+            </a>
+        </div>
+        <div class="repo-card">
+            <div class="repo-title">⚙️ Private · .NET 10</div>
+            <div class="repo-desc">Krever .NET 10 SDK — ingen Docker nødvendig. For de som vil gå dypere i koden.</div>
+            <span class="repo-tag">.NET 10</span>
+            <a class="repo-link" href="https://github.com/larssoraas/compliance-dsf-en-net-native-run/" target="_blank">
+                github.com/larssoraas/compliance-dsf-en-net-native-run ↗
+            </a>
+        </div>
+    </div>
+
+    <div style="margin-top: 2rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem 2rem;">
+        <h4 style="font-size: 0.95rem; margin-bottom: 1rem;">Live agent monitor — se fabrikken kjøre i sanntid</h4>
+        <div class="code-snippet">
+<span class="cm"># Terminal (alle OS):</span>
+<span class="kw">while</span> true; <span class="kw">do</span>
+  clear
+  bash .claude/hooks/agent-watch.sh
+  sleep 1
+<span class="kw">done</span>
+
+<span class="cm"># GUI — flytende vindu, alltid på topp:</span>
+python3 .claude/hooks/agent-watch-gui.py
+        </div>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.8rem;">Prereqs: macOS (Python 3 inkludert) · Windows (python.org install — husk "Add to PATH") · Linux (sudo apt install python3-tk)</p>
+    </div>
+
+    <div style="margin-top: 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem 2rem;">
+        <h4 style="font-size: 0.95rem; margin-bottom: 0.8rem;">Hva er i repoet</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.8rem;">
+            <div>
+                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">src/</span>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Full compliance-service</p>
+            </div>
+            <div>
+                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">tests/</span>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">47 passerende tester</p>
+            </div>
+            <div>
+                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">scenarios/</span>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">6 holdout-scenarioer (fasiten)</p>
+            </div>
+            <div>
+                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">doc/workshop-tasks.md</span>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Alle spor + copy-paste-prompts</p>
+            </div>
+            <div>
+                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">.claude/skills/</span>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Agentrollebeskrivelser</p>
+            </div>
+            <div>
+                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">CLAUDE.md</span>
+                <p style="font-size: 0.75rem; color: var(--text-muted);">Fabrikkontrakten — start her</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"><span class="divider-inner">⚙️ 🏭 ⚙️</span></div>
+
 <!-- Oppgaver -->
 <section id="oppgaver">
     <div class="section-label">04 · Workshop</div>
@@ -1195,80 +1369,6 @@ gh run view --log-failed
 <span class="cm"># Etter fiks:</span>
 git push
 gh run watch
-        </div>
-    </div>
-</section>
-
-<div class="section-divider"><span class="divider-inner">⚙️ 🏭 ⚙️</span></div>
-
-<!-- Repos -->
-<section id="repos">
-    <div class="section-label">🔗 Repo</div>
-    <h2 class="section-title">Alt du trenger er inni</h2>
-    <p class="section-subtitle">To versjoner tilgjengelig. Alle spor og prompts i <code>doc/workshop-tasks.md</code>.</p>
-
-    <div class="repo-grid">
-        <div class="repo-card">
-            <div class="repo-title">🐳 Public · Docker</div>
-            <div class="repo-desc">Krever Docker — ingen lokal .NET SDK nødvendig. Enkleste oppsett for workshopen.</div>
-            <span class="repo-tag">Docker</span>
-            <a class="repo-link" href="https://github.com/larssoraas/compliance-dsf-run-en/" target="_blank">
-                github.com/larssoraas/compliance-dsf-run-en ↗
-            </a>
-        </div>
-        <div class="repo-card">
-            <div class="repo-title">⚙️ Private · .NET 10</div>
-            <div class="repo-desc">Krever .NET 10 SDK — ingen Docker nødvendig. For de som vil gå dypere i koden.</div>
-            <span class="repo-tag">.NET 10</span>
-            <a class="repo-link" href="https://github.com/larssoraas/compliance-dsf-en-net-native-run/" target="_blank">
-                github.com/larssoraas/compliance-dsf-en-net-native-run ↗
-            </a>
-        </div>
-    </div>
-
-    <div style="margin-top: 2rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem 2rem;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 1rem;">Live agent monitor — se fabrikken kjøre i sanntid</h4>
-        <div class="code-snippet">
-<span class="cm"># Terminal (alle OS):</span>
-<span class="kw">while</span> true; <span class="kw">do</span>
-  clear
-  bash .claude/hooks/agent-watch.sh
-  sleep 1
-<span class="kw">done</span>
-
-<span class="cm"># GUI — flytende vindu, alltid på topp:</span>
-python3 .claude/hooks/agent-watch-gui.py
-        </div>
-        <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.8rem;">Prereqs: macOS (Python 3 inkludert) · Windows (python.org install — husk "Add to PATH") · Linux (sudo apt install python3-tk)</p>
-    </div>
-
-    <div style="margin-top: 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem 2rem;">
-        <h4 style="font-size: 0.95rem; margin-bottom: 0.8rem;">Hva er i repoet</h4>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.8rem;">
-            <div>
-                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">src/</span>
-                <p style="font-size: 0.75rem; color: var(--text-muted);">Full compliance-service</p>
-            </div>
-            <div>
-                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">tests/</span>
-                <p style="font-size: 0.75rem; color: var(--text-muted);">47 passerende tester</p>
-            </div>
-            <div>
-                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">scenarios/</span>
-                <p style="font-size: 0.75rem; color: var(--text-muted);">6 holdout-scenarioer (fasiten)</p>
-            </div>
-            <div>
-                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">doc/workshop-tasks.md</span>
-                <p style="font-size: 0.75rem; color: var(--text-muted);">Alle spor + copy-paste-prompts</p>
-            </div>
-            <div>
-                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">.claude/skills/</span>
-                <p style="font-size: 0.75rem; color: var(--text-muted);">Agentrollebeskrivelser</p>
-            </div>
-            <div>
-                <span style="font-family: var(--mono); font-size: 0.78rem; color: var(--cyan);">CLAUDE.md</span>
-                <p style="font-size: 0.75rem; color: var(--text-muted);">Fabrikkontrakten — start her</p>
-            </div>
         </div>
     </div>
 </section>
@@ -1498,7 +1598,6 @@ python3 .claude/hooks/agent-watch-gui.py
         line.style.color = color || '#666';
         line.textContent = msg;
         logEl.appendChild(line);
-        logEl.scrollTop = logEl.scrollHeight;
     }
 
     async function runPipeline() {
@@ -1547,8 +1646,8 @@ python3 .claude/hooks/agent-watch-gui.py
         { id: 'bakgrunn',  name: '01 · Bakgrunn' },
         { id: 'prinsipper',name: '02 · Prinsipper' },
         { id: 'demo',      name: '03 · Demo' },
-        { id: 'oppgaver',  name: '04 · Oppgaver' },
         { id: 'repos',     name: 'Repos' },
+        { id: 'oppgaver',  name: '04 · Oppgaver' },
         { id: 'diskusjon', name: '05 · Diskusjon' },
         { id: 'tips',      name: 'Tips' },
     ];
